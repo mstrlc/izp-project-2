@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 /*
 ! Prekladat s argumenty: gcc -std=c99 -Wall -Wextra -Werror setcal.c -o setcal
@@ -15,19 +16,62 @@ Vstupni soubor:
 3.  Příkazy nad množinami a relacemi - jeden nebo více řádků začínající "C " a pokračující identifikátorem příkazu.
 
 Slovnicek:
-mnozina = set
-relace = relation
-prvek = element
+    mnozina = set
+    relace = relation
+    prvek = element
+
+Poznamky:
+    Zatim nevim, jak udelat mnozinu stringu, ted to funguje jako mnozina znaku, ale funguje to
+
 */
 
 typedef struct // Definiton of the data type used to store sets
 {
-    char *elements[31]; // Maximal length of one element is 30 characters, 31 is used to account for null character
-    int size;           // Number of elements in set
+    char *elements; //
+    int size;       // Number of elements in set
 } set_t;
 
-int main(int argc, char *argv[])
+void set_const(set_t *set, int size) //Construct a set
 {
+    set->elements = (char *)malloc(size * sizeof(char));
+    set->size = size;
+}
+
+void vector_dest(set_t *set) // Destruct a set
+{
+    if (set->elements != NULL)
+    {
+        free(set->elements);
+    }
+    set->elements = NULL;
+    set->size = 0;
+}
+
+void set_init(set_t *set)
+{
+    for (int i = 0; i < set->size; i++)
+    {
+        set->elements[i] = 'A' + i;
+    }
+}
+
+void set_print(set_t *set) // Print a given set using printf
+{
+    printf("[%c, ", set->elements[0]);      // Print the first element
+    for (int i = 1; i < set->size - 1; i++) // Print second through penultimate elements
+    {
+        printf("%c, ", set->elements[i]);
+    }
+    printf("%c]\n", set->elements[set->size - 1]); // Print the last element
+}
+
+int main()
+{
+    set_t universe;
+
+    set_const(&universe, 4);
+    set_init(&universe);
+    set_print(&universe);
 
     return 0;
 }
