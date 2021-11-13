@@ -95,7 +95,7 @@ void print_input_file(char *path) // ! Nacte a vypise vstupni soubor
 int main(int argc, char **argv)
 {
     set_t universe;
-    set_const(&universe, X); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
+    set_const(&universe, 2); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
     set_init(&universe);
 
     printf("%d, %s\n", argc, argv[0]);       // ! jen aby se to zkompilovalo, kdyz to tu neni tak to krici
