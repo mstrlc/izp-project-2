@@ -95,11 +95,13 @@ void print_input_file(char *path) // ! Nacte a vypise vstupni soubor
 int main(int argc, char **argv)
 {
     set_t universe;
-    set_const(&universe, 2); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
+    set_const(&universe, 3); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
     set_init(&universe);
 
-    printf("%d, %s\n", argc, argv[0]);       // ! jen aby se to zkompilovalo, kdyz to tu neni tak to krici
-    char *univ_line = "U a b c f d x y z\n"; // ! testovaci radek, stejny jako to co se dostane ze souboru
+    set_print(&universe);
+
+    printf("Program path: %s, number of arguments: %d\n", argv[0], argc); // ! jen aby se to zkompilovalo, kdyz to tu neni tak to krici
+    // char *univ_line = "U a b c f d x y z\n"; // ! testovaci radek, stejny jako to co se dostane ze souboru
 
     // ! je potreba napsat funkci, ktera by vzala ten radek a ty informace z neho ulozila do mnoziny universe (pocet prvku a prvky)
     // ! - prozatim bych to testoval ze stringu univ_line, nacitani primo ze souboru bych udelal az pak
