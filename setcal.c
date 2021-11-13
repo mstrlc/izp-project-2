@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-/*
+/* test
 ! Prekladat s argumenty: gcc -std=c99 -Wall -Wextra -Werror setcal.c -o setcal
 ! Prosim, pokud budete delat upravy, nemazat nic co napsal nekdo jiny. Staci zakomentarovat a napsat, proc jste to udelali.
 ! Komentare s ! na zacatku jsou pracovni, pro nas at vime, muzou byt v cestine. Normalni komentare bych psal v anglictine, ale to staci udelat dodatecne nakonec.
