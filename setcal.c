@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-<<<<<<< HEAD
 /*
-DALA TEST
+ *DALA 15.11. +-13:40 -pridana funkce na spocitani velikosti mnoziny a implementace z textoveho souboru "testik.txt"
+ *
 ! Prekladat s argumenty: gcc -std=c99 -Wall -Wextra -Werror setcal.c -o setcal
 ! Prosim, pokud budete delat upravy, nemazat nic co napsal nekdo jiny. Staci zakomentarovat a napsat, proc jste to udelali.
 ! Komentare s ! na zacatku jsou pracovni, pro nas at vime, muzou byt v cestine. Normalni komentare bych psal v anglictine, ale to staci udelat dodatecne nakonec.
@@ -44,13 +44,40 @@ typedef struct // Definiton of the data type used to store sets
     int size;        // Number of elements in set
 } set_t;
 
-void set_const(set_t *set, int size) //Constructor for sets
-{
-    set->elements = (char **)malloc(size * sizeof(char *));
-    set->size = size;
+void elements_in_line(char *path, set_t *set, int line){ //counts elementsof concrete line of input file
+    FILE *input_file;
+    input_file = fopen(path, "r");
+    char c;
+    int count=0;
+    int i;
+
+    c = fgetc(input_file);
+    for(i=1; i<line; i++){
+        for(int j=0; j!='\n'; j++){
+            c=fgetc(input_file);
+        }
+    }
+    
+    c=fgetc(input_file);
+    c=fgetc(input_file);
+    if(i>1) c=fgetc(input_file);
+    while (c != EOF)
+    {
+        if(c==' ' || c=='\n') count++;
+        c = fgetc(input_file);
+    }
+
+    fclose(input_file);
+
+    set->size=count;
 }
 
-void vector_dest(set_t *set) // Destructor for sets
+void set_const(set_t *set) //Constructor for sets
+{
+    set->elements = (char **)malloc(set->size * sizeof(char *));
+}
+
+void set_dest(set_t *set) // Destructor for sets
 {
     if (set->elements != NULL)
     {
@@ -64,7 +91,7 @@ void set_init(set_t *set) // ! Testovaci funkce na vyplneni mnoziny prvky (text.
 {
     for (int i = 0; i < set->size; i++)
     {
-        set->elements[i] = "A";
+        set->elements[i] = "AAi";
     }
 }
 
@@ -94,10 +121,42 @@ void print_input_file(char *path) // ! Nacte a vypise vstupni soubor
     fclose(input_file);
 }
 
+/*
+ !nejspis nebude potreba, ale necham to tu
+void chars_in_line(char *path, set_t *set, int line) // ! Nacte pocet znaku (bez mezer) daneho radku ze vstupniho souboru
+{
+    FILE *input_file;
+    input_file = fopen(path, "r");
+    char c;
+    int count=0;
+
+    c = fgetc(input_file);
+    for(int i=1; i<line; i++){
+        for(int j=0; j!='\n'; j++){
+            c=fgetc(input_file);
+        }
+    }
+    
+    c=fgetc(input_file);
+    c=fgetc(input_file);
+    while (c != '\n')
+    {
+        if(c!=' ') count++;
+        c = fgetc(input_file);
+    }
+
+    fclose(input_file);
+
+    set->size=count;
+}
+*/
+
 int main(int argc, char **argv)
 {
     set_t universe;
-    set_const(&universe, 3); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
+    print_input_file("testik.txt");
+    elements_in_line("testik.txt", &universe, 1);
+    set_const(&universe); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
     set_init(&universe);
 
     set_print(&universe);
