@@ -151,6 +151,41 @@ void print_file(char *path) // ! Nacte a vypise vstupni soubor
     fclose(input_file);
 }
 
+int get_set_size(char *line_from_file)
+{
+    int spaces = 0;
+    for (int i = 0; line_from_file[i] != '\0'; i++)
+    {
+        if (line_from_file[i] == ' ')
+            spaces++;
+    }
+
+    return spaces;
+}
+
+void move_to_set(char *line_from_file, char *substring, set_t *set)
+{
+    int index = 0;
+    for (int i = 1; line_from_file[i] != '\0'; i++)
+    {
+        memset(substring, '\0', 31);
+        if (line_from_file[i] != ' ')
+        {
+            int j = 0;
+            while (line_from_file[i] != ' ' && line_from_file[i] != '\n')
+            {
+                substring[j] = line_from_file[i];
+                i++;
+                j++;
+            }
+            set->elements[index] = malloc(31); // max length of substring is 30 characters
+                                               // nie som si ista, ci ked destroyneme celu mnozinu, tak sa uvolni aj tato pamat co bola alokovana
+            memcpy((set->elements[index]), substring, 31);
+            index++;
+        }
+    }
+}
+
 /*
  !nejspis nebude potreba, ale necham to tu
 void chars_in_line(char *path, set_t *set, int line) // ! Nacte pocet znaku (bez mezer) daneho radku ze vstupniho souboru
