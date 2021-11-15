@@ -103,7 +103,7 @@ void set_init(set_t *set) // ! Testovaci funkce na vyplneni mnoziny prvky (text.
 void set_print(set_t *set) // Print a given set
 {
     printf("S %s", set->elements[0]);   // Print the first element
-    for (int i = 1; i < set->size; i++) // Print second through penultimate elements
+    for (int i = 1; i < set->size; i++) // Print second through last elements
     {
         printf(" %s", set->elements[i]);
     }
