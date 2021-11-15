@@ -44,32 +44,37 @@ typedef struct // Definiton of the data type used to store sets
     int size;        // Number of elements in set
 } set_t;
 
-void elements_in_line(char *path, set_t *set, int line){ //counts elementsof concrete line of input file
+void elements_in_line(char *path, set_t *set, int line)
+{ //counts elementsof concrete line of input file
     FILE *input_file;
     input_file = fopen(path, "r");
     char c;
-    int count=0;
+    int count = 0;
     int i;
 
     c = fgetc(input_file);
-    for(i=1; i<line; i++){
-        for(int j=0; j!='\n'; j++){
-            c=fgetc(input_file);
+    for (i = 1; i < line; i++)
+    {
+        for (int j = 0; j != '\n'; j++)
+        {
+            c = fgetc(input_file);
         }
     }
-    
-    c=fgetc(input_file);
-    c=fgetc(input_file);
-    if(i>1) c=fgetc(input_file);
+
+    c = fgetc(input_file);
+    c = fgetc(input_file);
+    if (i > 1)
+        c = fgetc(input_file);
     while (c != EOF)
     {
-        if(c==' ' || c=='\n') count++;
+        if (c == ' ' || c == '\n')
+            count++;
         c = fgetc(input_file);
     }
 
     fclose(input_file);
 
-    set->size=count;
+    set->size = count;
 }
 
 void set_const(set_t *set) //Constructor for sets
@@ -97,15 +102,15 @@ void set_init(set_t *set) // ! Testovaci funkce na vyplneni mnoziny prvky (text.
 
 void set_print(set_t *set) // Print a given set
 {
-    printf("[%s, ", set->elements[0]);      // Print the first element
-    for (int i = 1; i < set->size - 1; i++) // Print second through penultimate elements
+    printf("S %s", set->elements[0]);   // Print the first element
+    for (int i = 1; i < set->size; i++) // Print second through penultimate elements
     {
-        printf("%s, ", set->elements[i]);
+        printf(" %s", set->elements[i]);
     }
-    printf("%s]\n", set->elements[set->size - 1]); // Print the last element
+    printf("\n");
 }
 
-void print_input_file(char *path) // ! Nacte a vypise vstupni soubor
+void input_file_print(char *path) // ! Nacte a vypise vstupni soubor
 {
     FILE *input_file;
     input_file = fopen(path, "r");
@@ -154,10 +159,12 @@ void chars_in_line(char *path, set_t *set, int line) // ! Nacte pocet znaku (bez
 int main(int argc, char **argv)
 {
     set_t universe;
-    print_input_file("testik.txt");
+    input_file_print("testik.txt");
     elements_in_line("testik.txt", &universe, 1);
     set_const(&universe); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
     set_init(&universe);
+
+    printf("---\n");
 
     set_print(&universe);
 
