@@ -110,11 +110,36 @@ void set_print(set_t *set) // Print a given set
     printf("\n");
 }
 
-void input_file_print(char *path) // ! Nacte a vypise vstupni soubor
+void print_line_in_file(char *path, int line)
 {
     FILE *input_file;
     input_file = fopen(path, "r");
-    char c;
+    char c = 0;
+
+    for (int i = 0; i < line; i++)
+    {
+        for (int j = 0; c != '\n'; j++)
+        {
+            c = fgetc(input_file);
+        }
+    }
+
+    c = fgetc(input_file);
+    while (c != '\n')
+    {
+        printf("%c", c);
+        c = fgetc(input_file);
+    }
+    printf("\n");
+
+    fclose(input_file);
+}
+
+void print_file(char *path) // ! Nacte a vypise vstupni soubor
+{
+    FILE *input_file;
+    input_file = fopen(path, "r");
+    char c = 0;
 
     c = fgetc(input_file);
     while (c != -1)
@@ -159,14 +184,15 @@ void chars_in_line(char *path, set_t *set, int line) // ! Nacte pocet znaku (bez
 int main(int argc, char **argv)
 {
     set_t universe;
-    input_file_print("testik.txt");
+
+    print_file("testik.txt");
     elements_in_line("testik.txt", &universe, 1);
     set_const(&universe); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
     set_init(&universe);
 
     printf("---\n");
 
-    set_print(&universe);
+    print_line_in_file("sets.txt", 1);
 
     printf("Program path: %s, number of arguments: %d\n", argv[0], argc); // ! jen aby se to zkompilovalo, kdyz to tu neni tak to krici
     // char *univ_line = "U a b c f d x y z\n"; // ! testovaci radek, stejny jako to co se dostane ze souboru
