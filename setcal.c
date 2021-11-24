@@ -1,239 +1,305 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 
-/*
- *DALA 15.11. +-13:40 -pridana funkce na spocitani velikosti mnoziny a implementace z textoveho souboru "testik.txt"
- *
-! Prekladat s argumenty: gcc -std=c99 -Wall -Wextra -Werror setcal.c -o setcal
-! Prosim, pokud budete delat upravy, nemazat nic co napsal nekdo jiny. Staci zakomentarovat a napsat, proc jste to udelali.
-! Komentare s ! na zacatku jsou pracovni, pro nas at vime, muzou byt v cestine. Normalni komentare bych psal v anglictine, ale to staci udelat dodatecne nakonec.
-
-Link na wiki:
-https://wis.fit.vutbr.cz/FIT/st/cwk.php.cs?title=Projekt2&csid=779718&id=14723
-
-Vstupni soubor:
-1.  Definice univerza - jeden řádek začínající "U " a pokračující mezerou oddělenými prvky,
-2.  Definice množin a relací - jeden nebo více řádků začínající "S " nebo "R " a pokračující mezerou oddělenými prvky
-    (řádek začínající "S" indikuje definici množiny, "R" slouží pro definici relace),
-3.  Příkazy nad množinami a relacemi - jeden nebo více řádků začínající "C " a pokračující identifikátorem příkazu.
-
-Slovnicek:
-    mnozina = set
-    relace = relation
-    prvek = element
-
-Tipy pro implementaci:
-    ✓ Vytvořte datový typ pro množinu. Uvažujte předem neznámý počet prvků. Každý prvek (řetězec) by měl být dynamicky alokován.
-    ✓ Implementujte funkci pro tisk množiny.
-    - Implementujte funkci pro načtení množiny ze souboru do paměti.
-    - Vytvořte základní (unární operace) nad množinou.
-    - Vytvořte datový typ pro načtení více množin. Implementujte další operace nad množinami.
-    - Vytvořte datový typ pro relaci.
-    - Vytvořte funkci pro načtení relace ze souboru do paměti.
-    - Implementujte operace nad relacemi.
-
-Poznamky:
-    
-*/
-
-typedef struct // Definiton of the data type used to store sets
+typedef struct
 {
-    char **elements; // Array of elements stored as strings
-    int size;        // Number of elements in set
+    char **elements;
+    int size;
 } set_t;
 
-void elements_in_line(char *path, set_t *set, int line)
-{ //counts elementsof concrete line of input file
-    FILE *input_file;
-    input_file = fopen(path, "r");
-    char c;
-    int count = 0;
-    int i;
+typedef struct
+{
 
-    c = fgetc(input_file);
-    for (i = 1; i < line; i++)
+} rel_t;
+
+void set_const(set_t *set, int size) //Constructor for sets
+{
+    set->size = size;
+
+    if (size == 0)
     {
-        for (int j = 0; j != '\n'; j++)
+        set->elements = malloc(sizeof(char *));
+    }
+    else
+    {
+        set->elements = malloc(size * sizeof(char *));
+
+        for (int i = 0; i < set->size; i++)
         {
-            c = fgetc(input_file);
+            set->elements[i] = malloc(31 * sizeof(char));
+            if (set->elements[i] == NULL) // Error
+            {
+                fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
+                exit(1);
+            }
         }
     }
-
-    c = fgetc(input_file);
-    c = fgetc(input_file);
-    if (i > 1)
-        c = fgetc(input_file);
-    while (c != EOF)
-    {
-        if (c == ' ' || c == '\n')
-            count++;
-        c = fgetc(input_file);
-    }
-
-    fclose(input_file);
-
-    set->size = count;
 }
 
-void set_const(set_t *set) //Constructor for sets
-{
-    set->elements = (char **)malloc(set->size * sizeof(char *));
-}
-
-void set_dest(set_t *set) // Destructor for sets
-{
-    if (set->elements != NULL)
-    {
-        free(set->elements);
-    }
-    set->elements = NULL;
-    set->size = 0;
-}
-
-void set_init(set_t *set) // ! Testovaci funkce na vyplneni mnoziny prvky (text. retezci)
+void set_dest(set_t *set)
 {
     for (int i = 0; i < set->size; i++)
     {
-        set->elements[i] = "AAi";
-    }
-}
-
-void set_print(set_t *set) // Print a given set
-{
-    printf("S %s", set->elements[0]);   // Print the first element
-    for (int i = 1; i < set->size; i++) // Print second through last elements
-    {
-        printf(" %s", set->elements[i]);
-    }
-    printf("\n");
-}
-
-void print_line_in_file(char *path, int line)
-{
-    FILE *input_file;
-    input_file = fopen(path, "r");
-    char c = 0;
-
-    for (int i = 0; i < line; i++)
-    {
-        for (int j = 0; c != '\n'; j++)
+        if (set->elements[i] != NULL)
         {
-            c = fgetc(input_file);
+            free(set->elements[i]);
         }
     }
+    free(set->elements);
+    set->size = 0;
+}
 
-    c = fgetc(input_file);
-    while (c != '\n')
+void set_init(set_t *set, char *string)
+{
+    for (int i = 0; i < set->size; i++)
     {
-        printf("%c", c);
-        c = fgetc(input_file);
+        strcpy(set->elements[i], string);
+    }
+}
+
+void set_print(set_t *set, char type) // Print a given set
+{
+    printf("%c ", type);
+    if (set->elements[0] != NULL) // If the first element is null, there are no elements in the set
+    {
+        printf("%s", set->elements[0]);     // Print the first element
+        for (int i = 1; i < set->size; i++) // Print second through last elements
+        {
+            printf(" %s", set->elements[i]);
+        }
     }
     printf("\n");
-
-    fclose(input_file);
 }
 
-void print_file(char *path) // ! Nacte a vypise vstupni soubor
+int set_from_line(set_t *set, char *line)
 {
-    FILE *input_file;
-    input_file = fopen(path, "r");
-    char c = 0;
+    char *element = (char *)malloc(31 * sizeof(char));
 
-    c = fgetc(input_file);
-    while (c != -1)
+    int i = 0;
+    int number_of_elements = 0;
+    while (line[i] != '\n')
     {
-        printf("%c", c);
-        c = fgetc(input_file);
-    }
-
-    fclose(input_file);
-}
-
-int get_set_size(char *line_from_file)
-{
-    int spaces = 0;
-    for (int i = 0; line_from_file[i] != '\0'; i++)
-    {
-        if (line_from_file[i] == ' ')
-            spaces++;
-    }
-
-    return spaces;
-}
-
-void move_to_set(char *line_from_file, char *substring, set_t *set)
-{
-    int index = 0;
-    for (int i = 1; line_from_file[i] != '\0'; i++)
-    {
-        memset(substring, '\0', 31);
-        if (line_from_file[i] != ' ')
+        if (line[i] == ' ')
         {
-            int j = 0;
-            while (line_from_file[i] != ' ' && line_from_file[i] != '\n')
+            number_of_elements++;
+        }
+        i++;
+    }
+
+    set_const(set, number_of_elements);
+
+    if (number_of_elements != 0)
+    {
+        int element_index = 0;
+
+        for (int i = 1; line[i] != '\0'; i++)
+        {
+            memset(element, '\0', 31);
+            if (line[i] != ' ')
             {
-                substring[j] = line_from_file[i];
-                i++;
-                j++;
+                int j = 0;
+                while (line[i] != ' ' && line[i] != '\n')
+                {
+                    element[j] = line[i];
+                    i++;
+                    j++;
+                    if (j > 30)
+                    {
+                        free(element);
+                        fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                        return 1;
+                    }
+                }
+                strcpy((set->elements[element_index]), element);
+                element_index++;
             }
-            set->elements[index] = malloc(31); // max length of substring is 30 characters
-                                               // nie som si ista, ci ked destroyneme celu mnozinu, tak sa uvolni aj tato pamat co bola alokovana
-            memcpy((set->elements[index]), substring, 31);
-            index++;
         }
     }
+    free(element);
+    return 0;
 }
 
-/*
- !nejspis nebude potreba, ale necham to tu
-void chars_in_line(char *path, set_t *set, int line) // ! Nacte pocet znaku (bez mezer) daneho radku ze vstupniho souboru
+void cmd_empty(set_t *set)
 {
-    FILE *input_file;
-    input_file = fopen(path, "r");
-    char c;
-    int count=0;
-
-    c = fgetc(input_file);
-    for(int i=1; i<line; i++){
-        for(int j=0; j!='\n'; j++){
-            c=fgetc(input_file);
-        }
-    }
-    
-    c=fgetc(input_file);
-    c=fgetc(input_file);
-    while (c != '\n')
+    if (set->size == 0)
     {
-        if(c!=' ') count++;
-        c = fgetc(input_file);
+        printf("true\n");
+    }
+    else
+        printf("false\n");
+}
+
+void cmd_card(set_t *set)
+{
+    printf("%d\n", set->size);
+}
+
+void cmd_complement(set_t *universe, set_t *set)
+{
+    if (set->size == 0)
+    {
+        set_print(universe, 'S');
+    }
+    else
+    {
+        set_t complement;
+        set_const(&complement, (universe->size - set->size));
+
+        int comp_index = 0;
+
+        for (int i = 0; i < universe->size; i++)
+        {
+            bool found = false;
+
+            for (int j = 0; j < set->size; j++)
+            {
+                if (strcmp(universe->elements[i], set->elements[j]) == 0)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                strcpy(complement.elements[comp_index], universe->elements[i]);
+                comp_index++;
+            }
+        }
+        set_print(&complement, 'S');
+        set_dest(&complement);
+    }
+}
+
+void execute_command(set_t *universe, set_t *sets, char *string)
+{
+    char *command = (char *)malloc(31 * sizeof(char));
+    int index_A = 0;
+    int index_B = 0;
+
+    sscanf(string, "C %s %d %d\n", command, &index_A, &index_B);
+    // printf("A: %d B: %d\n", index_A, index_B);
+
+    if (strcmp(command, "empty") == 0)
+    {
+        cmd_empty(&sets[index_A]);
+    }
+    else if (strcmp(command, "card") == 0)
+    {
+        cmd_card(&sets[index_A]);
+    }
+    else if (strcmp(command, "complement") == 0)
+    {
+        cmd_complement(universe, &sets[index_A]);
     }
 
-    fclose(input_file);
-
-    set->size=count;
+    free(command);
 }
-*/
 
 int main(int argc, char **argv)
 {
-    set_t universe;
+    char *path = argv[1];
+    // printf("number of arguments: %d, path: %s\n", argc, path);
+    if (argc == 2)
+    {
+        FILE *input_file;
+        input_file = fopen(path, "r");
 
-    print_file("testik.txt");
-    elements_in_line("testik.txt", &universe, 1);
-    set_const(&universe); // ! druhy argument konstruktoru je velikost mnoziny univerza, musi se napsat funkce ktera ten radek z textoveho souboru prelozi
-    set_init(&universe);
+        if (input_file == NULL)
+        {
+            fprintf(stderr, "Input file could not be opened. Does the file exist and do you have permissions?\nTerminating program.\n");
+            return 1;
+        }
 
-    printf("---\n");
+        set_t universe;
 
-    print_line_in_file("sets.txt", 1);
+        int sets_max_number = 5;
+        set_t *sets = (set_t *)malloc(sets_max_number * sizeof(set_t));
+        int set_count = 0;
 
-    printf("Program path: %s, number of arguments: %d\n", argv[0], argc); // ! jen aby se to zkompilovalo, kdyz to tu neni tak to krici
-    // char *univ_line = "U a b c f d x y z\n"; // ! testovaci radek, stejny jako to co se dostane ze souboru
+        int line_max_len = 50;
+        char *line = (char *)malloc(line_max_len * sizeof(char));
+        int line_index = 0;
+        int row = 1;
+        char c;
 
-    // ! je potreba napsat funkci, ktera by vzala ten radek a ty informace z neho ulozila do mnoziny universe (pocet prvku a prvky)
-    // ! - prozatim bych to testoval ze stringu univ_line, nacitani primo ze souboru bych udelal az pak
+        while ((c = fgetc(input_file)) != EOF)
+        {
+            if (c != '\n')
+            {
+                if (line_index >= line_max_len)
+                {
+                    line_max_len += 50;
+                    line = realloc(line, (line_max_len) * sizeof(char));
+                }
+                line[line_index] = c;
+                line_index++;
+            }
+            else
+            {
+                line[line_index] = '\n';
 
-    return 0;
+                switch (line[0])
+                {
+                case 'U':
+                    if (set_from_line(&universe, line) == 0)
+                    {
+                        set_print(&universe, 'U');
+                    }
+                    else
+                    {
+                        // TODO Clean up
+                        return 1;
+                    }
+                    break;
+                case 'S':
+                    if (set_count >= sets_max_number)
+                    {
+                        sets_max_number += 10;
+                        sets = realloc(sets, (sets_max_number) * sizeof(set_t));
+                    }
+                    if (set_from_line(&sets[row], line) == 0)
+                    {
+                        set_print(&sets[row], 'S');
+                        set_count++;
+                    }
+                    else
+                    {
+                        // TODO Clean up
+                        return 1;
+                    }
+                    break;
+                case 'C':
+                    execute_command(&universe, sets, line);
+                    break;
+                default:
+                    break;
+                }
+
+                row++;
+                line_index = 0;
+                memset(line, '\0', 50 * sizeof(char));
+            }
+        }
+
+        // Cleaning up
+
+        free(line);
+        fclose(input_file);
+
+        for (int i = 0; i < set_count + 2; i++)
+        {
+            set_dest(&sets[i]);
+        }
+        free(sets);
+
+        set_dest(&universe);
+    }
+    else
+    {
+        fprintf(stderr, "Too few arguments supplied.\nTerminating program.\n");
+        return 1;
+    }
 }
