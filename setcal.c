@@ -24,7 +24,7 @@ typedef struct
 
 typedef struct
 {
-    char **elements;
+    char ***elements;
     int size;
 } rel_t;
 
@@ -247,6 +247,8 @@ void cmd_complement(set_t *universe, set_t *set)
         set_dest(&complement);
     }
 }
+
+//TODO prikazy nad mnozinami
 
 // void cmd_union(set_t *set_A, set_t *set_B)
 // {
