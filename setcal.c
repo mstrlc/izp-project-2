@@ -299,7 +299,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        fprintf(stderr, "Too few arguments supplied.\nTerminating program.\n");
+        fprintf(stderr, "Wrong number of arguments supplied.\nTerminating program.\n");
         return 1;
     }
 }
