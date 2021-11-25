@@ -4,12 +4,6 @@
 #include <stdbool.h>
 /*
 TO-DO LIST
-Matyas:
-- datovy typ pro relaci
-- nacitani prvku relace z radku
-- konstruktor a destruktor relace
-- tisk relace
-
 - Prvky univerza nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false
 - kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
 - spravna dealokace a uvolnovani pameti pri chybach
