@@ -10,6 +10,8 @@ Matyas:
 - konstruktor a destruktor relace
 - tisk relace
 
+- Prvky univerza nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false
+- kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
 - spravna dealokace a uvolnovani pameti pri chybach
 - prikazy s mnozinami
 */
@@ -111,21 +113,30 @@ int set_from_line(set_t *set, char *line)
             memset(element, '\0', 31);
             if (line[i] != ' ')
             {
-                int j = 0;
-                while (line[i] != ' ' && line[i] != '\n')
+                if ((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z'))
                 {
-                    element[j] = line[i];
-                    i++;
-                    j++;
-                    if (j > 30)
+                    int j = 0;
+                    while (line[i] != ' ' && line[i] != '\n')
                     {
-                        free(element);
-                        fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
-                        return 1;
+                        element[j] = line[i];
+                        i++;
+                        j++;
+                        if (j > 30)
+                        {
+                            free(element);
+                            fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                            return 1;
+                        }
                     }
+                    strcpy((set->elements[element_index]), element);
+                    element_index++;
                 }
-                strcpy((set->elements[element_index]), element);
-                element_index++;
+                else
+                {
+                    free(element);
+                    fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+                    return 1;
+                }
             }
         }
     }
@@ -237,9 +248,9 @@ void cmd_complement(set_t *universe, set_t *set)
     }
 }
 
-void cmd_union(set_t *set_A, set_t *set_B)
-{
-}
+// void cmd_union(set_t *set_A, set_t *set_B)
+// {
+// }
 
 void execute_command(set_t *universe, set_t *sets, char *string)
 {
@@ -262,10 +273,10 @@ void execute_command(set_t *universe, set_t *sets, char *string)
     {
         cmd_complement(universe, &sets[index_A]);
     }
-    else if (strcmp(command, "union") == 0)
-    {
-        cmd_union(&sets[index_A], &sets[index_B]);
-    }
+    // else if (strcmp(command, "union") == 0)
+    // {
+    //     cmd_union(&sets[index_A], &sets[index_B]);
+    // }
 
     free(command);
 }
