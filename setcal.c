@@ -121,6 +121,19 @@ int set_from_line(set_t *set, char *line)
     return 0;
 }
 
+int set_check(set_t *set)
+{
+    if (true) // TODO doplnit kontrolu
+    {
+        return 0;
+    }
+    else
+    {
+        fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+        return 1;
+    }
+}
+
 void cmd_empty(set_t *set)
 {
     if (set->size == 0)
@@ -260,7 +273,7 @@ int main(int argc, char **argv)
                         sets_max_number += 10;
                         sets = realloc(sets, (sets_max_number) * sizeof(set_t));
                     }
-                    if (set_from_line(&sets[row], line) == 0)
+                    if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row]) == 0))
                     {
                         set_print(&sets[row], 'S');
                         set_count++;
