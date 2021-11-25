@@ -22,12 +22,6 @@ typedef struct
     int size;
 } set_t;
 
-typedef struct
-{
-    char ***elements;
-    int size;
-} rel_t;
-
 void set_const(set_t *set, int size) //Constructor for sets
 {
     set->size = size;
@@ -144,6 +138,121 @@ int set_from_line(set_t *set, char *line)
     return 0;
 }
 
+typedef struct
+{
+    char a[31];
+    char b[31];
+} double_t;
+
+typedef struct
+{
+    double_t *elements;
+    int size;
+} rel_t;
+
+void rel_const(rel_t *rel, int size)
+{
+    rel->size = size;
+
+    if (size == 0)
+    {
+        rel->elements = malloc(sizeof(double_t));
+    }
+    else
+    {
+        rel->elements = malloc(size * sizeof(double_t));
+    }
+}
+
+void rel_dest(rel_t *rel)
+{
+    free(rel->elements);
+    rel->size = 0;
+}
+
+void rel_init(rel_t *rel, char *x, char *y)
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        strcpy(rel->elements[i].a, x);
+        strcpy(rel->elements[i].b, y);
+    }
+}
+
+void rel_print(rel_t *rel)
+{
+    printf("R");
+    if ((strcmp(rel->elements[0].a, "") != 0) && (strcmp(rel->elements[0].b, "") != 0)) // If the first element is null, there are no elements in the set
+    {
+        for (int i = 0; i < rel->size; i++)
+        {
+            printf(" (%s %s)", rel->elements[i].a, rel->elements[i].b); // Print the first through last elements
+        }
+    }
+    printf("\n");
+}
+
+int rel_from_line(rel_t *rel, char *line)
+{
+    int i = 0;
+    int number_of_pairs = 0;
+    while (line[i] != '\n')
+    {
+        if (line[i] == '(')
+        {
+            number_of_pairs++;
+        }
+        i++;
+    }
+
+    rel_const(rel, number_of_pairs);
+
+    if (number_of_pairs != 0)
+    {
+        int pair_index = 0;
+
+        int i = 1;
+        while (line[i] != '\0')
+        {
+            if (line[i] == '(')
+            {
+                i++;
+                int j = 0;
+                while (line[i] != ' ')
+                {
+                    rel->elements[pair_index].a[j] = line[i];
+                    i++;
+                    j++;
+                    if (j > 30)
+                    {
+                        fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                        return 1;
+                    }
+                }
+                i++;
+                j = 0;
+                while (line[i] != ')')
+                {
+                    rel->elements[pair_index].b[j] = line[i];
+                    i++;
+                    j++;
+                    if (j > 30)
+                    {
+                        fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                        return 1;
+                    }
+                }
+                pair_index++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+    }
+    return 0;
+}
+
 int universe_check(set_t *universe)
 {
     for (int i = 0; i < universe->size; i++) // Check if elements are not duplicite
@@ -195,6 +304,11 @@ int set_check(set_t *set, set_t *univ)
     }
     return 0;
 }
+
+// int rel_check()
+// {
+//TODO
+// }
 
 void cmd_empty(set_t *set)
 {
@@ -252,6 +366,7 @@ void cmd_complement(set_t *universe, set_t *set)
 
 // void cmd_union(set_t *set_A, set_t *set_B)
 // {
+// TODO union
 // }
 
 void execute_command(set_t *universe, set_t *sets, char *string)
@@ -303,6 +418,10 @@ int main(int argc, char **argv)
         int sets_max_number = 5;
         set_t *sets = (set_t *)malloc(sets_max_number * sizeof(set_t));
         int set_count = 0;
+
+        int rels_max_number = 5;
+        rel_t *rels = (rel_t *)malloc(rels_max_number * sizeof(rel_t));
+        int rel_count = 0;
 
         int line_max_len = 50;
         char *line = (char *)malloc(line_max_len * sizeof(char));
@@ -358,6 +477,24 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
+                case 'R':
+                    if (rel_count >= rels_max_number)
+                    {
+                        rels_max_number += 10;
+                        rels = realloc(sets, (sets_max_number) * sizeof(set_t));
+                    }
+                    if ((rel_from_line(&rels[row], line) == 0)) // todo rel check
+                    {
+                        printf("%d: ", row);
+                        rel_print(&rels[row]);
+                        rel_count++;
+                    }
+                    else
+                    {
+                        // TODO Clean up
+                        return 1;
+                    }
+                    break;
                 case 'C':
                     execute_command(&universe, sets, line);
                     break;
@@ -382,7 +519,11 @@ int main(int argc, char **argv)
         }
         free(sets);
 
-        // TODO Destrukce vsech relaci
+        for (int i = 0; i < rel_count + 2; i++)
+        {
+            rel_dest(&rels[i]);
+        }
+        free(rels);
 
         set_dest(&universe);
     }
