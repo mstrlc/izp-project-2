@@ -2,6 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+/*
+TO-DO LIST
+Matyas:
+- datovy typ pro relaci
+- nacitani prvku relace z radku
+- konstruktor a destruktor relace
+- tisk relace
+
+- spravna dealokace a uvolnovani pameti pri chybach
+- prikazy s mnozinami
+*/
 
 typedef struct
 {
@@ -11,7 +22,8 @@ typedef struct
 
 typedef struct
 {
-
+    char **elements;
+    int size;
 } rel_t;
 
 void set_const(set_t *set, int size) //Constructor for sets
@@ -121,17 +133,56 @@ int set_from_line(set_t *set, char *line)
     return 0;
 }
 
-int set_check(set_t *set)
+int universe_check(set_t *universe)
 {
-    if (true) // TODO doplnit kontrolu
+    for (int i = 0; i < universe->size; i++) // Check if elements are not duplicite
     {
-        return 0;
+        for (int j = 0; j < universe->size; j++)
+        {
+            if ((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j))
+            {
+                fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+                return 1;
+            }
+        }
     }
-    else
+    return 0;
+}
+
+int set_check(set_t *set, set_t *univ)
+{
+    for (int i = 0; i < set->size; i++)
     {
-        fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
-        return 1;
+        bool found = false;
+
+        for (int j = 0; j < univ->size; j++)
+        {
+            if (strcmp(set->elements[i], univ->elements[j]) == 0)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+            return 1;
+        }
     }
+
+    for (int i = 0; i < set->size; i++) // Check if elements are not duplicite
+    {
+        for (int j = 0; j < set->size; j++)
+        {
+            if ((strcmp(set->elements[i], set->elements[j]) == 0) && (i != j))
+            {
+                fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 void cmd_empty(set_t *set)
@@ -186,6 +237,10 @@ void cmd_complement(set_t *universe, set_t *set)
     }
 }
 
+void cmd_union(set_t *set_A, set_t *set_B)
+{
+}
+
 void execute_command(set_t *universe, set_t *sets, char *string)
 {
     char *command = (char *)malloc(31 * sizeof(char));
@@ -193,7 +248,7 @@ void execute_command(set_t *universe, set_t *sets, char *string)
     int index_B = 0;
 
     sscanf(string, "C %s %d %d\n", command, &index_A, &index_B);
-    // printf("A: %d B: %d\n", index_A, index_B);
+    printf("%s %d %d: ", command, index_A, index_B);
 
     if (strcmp(command, "empty") == 0)
     {
@@ -206,6 +261,10 @@ void execute_command(set_t *universe, set_t *sets, char *string)
     else if (strcmp(command, "complement") == 0)
     {
         cmd_complement(universe, &sets[index_A]);
+    }
+    else if (strcmp(command, "union") == 0)
+    {
+        cmd_union(&sets[index_A], &sets[index_B]);
     }
 
     free(command);
@@ -257,8 +316,9 @@ int main(int argc, char **argv)
                 switch (line[0])
                 {
                 case 'U':
-                    if (set_from_line(&universe, line) == 0)
+                    if ((set_from_line(&universe, line) == 0) && (universe_check(&universe) == 0))
                     {
+                        printf("%d: ", row);
                         set_print(&universe, 'U');
                     }
                     else
@@ -273,8 +333,9 @@ int main(int argc, char **argv)
                         sets_max_number += 10;
                         sets = realloc(sets, (sets_max_number) * sizeof(set_t));
                     }
-                    if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row]) == 0))
+                    if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row], &universe) == 0))
                     {
+                        printf("%d: ", row);
                         set_print(&sets[row], 'S');
                         set_count++;
                     }
@@ -307,6 +368,8 @@ int main(int argc, char **argv)
             set_dest(&sets[i]);
         }
         free(sets);
+
+        // TODO Destrukce vsech relaci
 
         set_dest(&universe);
     }
