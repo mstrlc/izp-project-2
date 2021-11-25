@@ -1,2 +1,2 @@
-# izp-project-2
-1bit fit vut - izp 2. projekt
+# IZP project 2
+1BIT FIT VUT
