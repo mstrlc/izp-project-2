@@ -356,12 +356,37 @@ void cmd_complement(set_t *universe, set_t *set)
     }
 }
 
-//TODO prikazy nad mnozinami
+void cmd_union(set_t *set_A, set_t *set_B)
+{
+    set_t set_union;
+    set_const(&set_union, set_A->size + set_B->size);
+    int count = 0;
 
-// void cmd_union(set_t *set_A, set_t *set_B)
-// {
-// TODO union
-// }
+    for(int i = 0; i < set_A->size; i++)
+    {
+        strcpy(set_union.elements[i], set_A->elements[i]);
+        count++;
+    }
+
+    for(i = 0; i < set_B->size; i++)
+    {
+        for(int j = 0; j < set_A->size; j++)
+        {
+            if(strcmp(set_B->elements[i], set_union->elements[j]) == 0)
+            {
+                break;
+            }
+            else if(j == (set_A->size-1))
+            {
+                strcpy(set_union.elements[count], set_B->elements[i]);
+                count++;
+                break; 
+            }
+        }
+    }
+    set_print(&set_union, 'S');
+    set_dest(&set_union);
+}
 
 void execute_command(set_t *universe, set_t *sets, char *string)
 {
@@ -384,10 +409,10 @@ void execute_command(set_t *universe, set_t *sets, char *string)
     {
         cmd_complement(universe, &sets[index_A]);
     }
-    // else if (strcmp(command, "union") == 0)
-    // {
-    //     cmd_union(&sets[index_A], &sets[index_B]);
-    // }
+    else if (strcmp(command, "union") == 0)
+    {
+        cmd_union(&sets[index_A], &sets[index_B]);
+    }
 
     free(command);
 }
