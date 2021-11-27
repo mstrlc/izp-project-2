@@ -368,6 +368,11 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string)
     int index_A = 0;
     int index_B = 0;
 
+    //tenhle kod nic nedela, ale je tam aby to fungovalo i kdyz se zatim s polem rels nic neprovadi :D
+    char *test = rels[3].elements[0].a;
+    if (false)
+        printf("%s", test);
+
     sscanf(string, "C %s %d %d\n", command, &index_A, &index_B);
     printf("%s %d %d: ", command, index_A, index_B);
 
@@ -410,11 +415,9 @@ int main(int argc, char **argv)
 
         int sets_max_number = 5;
         set_t *sets = (set_t *)malloc(sets_max_number * sizeof(set_t));
-        int set_count = 0;
 
         int rels_max_number = 5;
         rel_t *rels = (rel_t *)malloc(rels_max_number * sizeof(rel_t));
-        int rel_count = 0;
 
         int line_max_len = 50;
         char *line = (char *)malloc(line_max_len * sizeof(char));
@@ -453,7 +456,7 @@ int main(int argc, char **argv)
                     }
                     break;
                 case 'S':
-                    if (set_count >= sets_max_number)
+                    if (row >= sets_max_number)
                     {
                         sets_max_number += 10;
                         sets = realloc(sets, (sets_max_number) * sizeof(set_t));
@@ -462,7 +465,6 @@ int main(int argc, char **argv)
                     {
                         printf("%d: ", row);
                         set_print(&sets[row], 'S');
-                        set_count++;
                     }
                     else
                     {
@@ -471,7 +473,7 @@ int main(int argc, char **argv)
                     }
                     break;
                 case 'R':
-                    if (rel_count >= rels_max_number)
+                    if (row >= rels_max_number)
                     {
                         rels_max_number += 10;
                         rels = realloc(sets, (sets_max_number) * sizeof(set_t));
@@ -480,7 +482,6 @@ int main(int argc, char **argv)
                     {
                         printf("%d: ", row);
                         rel_print(&rels[row]);
-                        rel_count++;
                     }
                     else
                     {
@@ -506,13 +507,13 @@ int main(int argc, char **argv)
         free(line);
         fclose(input_file);
 
-        for (int i = 0; i < set_count + 2; i++)
+        for (int i = 0; i < row + 1; i++)
         {
             set_dest(&sets[i]);
         }
         free(sets);
 
-        for (int i = 0; i < rel_count + 2; i++)
+        for (int i = 0; i < row + 1; i++)
         {
             rel_dest(&rels[i]);
         }
