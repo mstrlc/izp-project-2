@@ -360,10 +360,9 @@ void cmd_complement(set_t *universe, set_t *set)
 
 // void cmd_union(set_t *set_A, set_t *set_B)
 // {
-// TODO union
 // }
 
-void execute_command(set_t *universe, set_t *sets, char *string)
+void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string)
 {
     char *command = (char *)malloc(31 * sizeof(char));
     int index_A = 0;
@@ -490,7 +489,7 @@ int main(int argc, char **argv)
                     }
                     break;
                 case 'C':
-                    execute_command(&universe, sets, line);
+                    execute_command(&universe, sets, rels, line);
                     break;
                 default:
                     break;
