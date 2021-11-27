@@ -2,6 +2,7 @@ U a b c x y z
 S a b c x
 S
 S x y z
+S b x r
 C empty 2
 C empty 3
 C empty 4
@@ -11,3 +12,4 @@ C card 4
 C complement 2
 C complement 3
 C complement 4
+C union 2 5
