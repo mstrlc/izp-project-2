@@ -1,7 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
+/*
+ *      setcal.c
+ *  
+ *      Set calculator
+ *      IZP - 2st project
+ * 
+ *      xkurci00    Kurcikova Julia 
+ *      xmacec03    Macecek Patrik  
+ *      xpenas02    Penas Dalibor   
+ *      xstrel03    Strelec Matyas  
+ *           
+ *       11/2021
+ */
+
+#include <stdio.h>   // Header defining variables and functions for input / output
+#include <stdlib.h>  // Header defining variables and functions for general functions
+#include <string.h>  // Header defining functions for working with strings
+#include <stdbool.h> // Header defining boolean types
 /*
 TO-DO LIST
 - Prvky univerza nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false
@@ -10,15 +24,15 @@ TO-DO LIST
 - prikazy s mnozinami
 */
 
-typedef struct
+typedef struct // Custom data type definiton for a set
 {
-    char **elements;
-    int size;
+    char **elements; // Elements are stored in an array of strings
+    int size;        // The number of elements
 } set_t;
 
-void set_const(set_t *set, int size) //Constructor for sets
+void set_const(set_t *set, int size) // Constructor for sets
 {
-    set->size = size;
+    set->size = size; // Set the size of element
 
     if (size == 0)
     {
@@ -26,12 +40,12 @@ void set_const(set_t *set, int size) //Constructor for sets
     }
     else
     {
-        set->elements = malloc(size * sizeof(char *));
+        set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
 
         for (int i = 0; i < set->size; i++)
         {
-            set->elements[i] = malloc(31 * sizeof(char));
-            if (set->elements[i] == NULL) // Error
+            set->elements[i] = malloc(31 * sizeof(char)); // Allocate memory for each element
+            if (set->elements[i] == NULL)                 // If malloc returns NULL, there was an error when accessing memory
             {
                 fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
                 exit(1);
@@ -40,9 +54,9 @@ void set_const(set_t *set, int size) //Constructor for sets
     }
 }
 
-void set_dest(set_t *set)
+void set_dest(set_t *set) // Destructor for sets
 {
-    for (int i = 0; i < set->size; i++)
+    for (int i = 0; i < set->size; i++) // Go through all individual elements
     {
         if (set->elements[i] != NULL)
         {
@@ -53,7 +67,7 @@ void set_dest(set_t *set)
     set->size = 0;
 }
 
-void set_init(set_t *set, char *string)
+void set_init(set_t *set, char *string) // TODO smazat pak
 {
     for (int i = 0; i < set->size; i++)
     {
@@ -61,13 +75,12 @@ void set_init(set_t *set, char *string)
     }
 }
 
-void set_print(set_t *set, char type) // Print a given set
+void set_print(set_t *set, char type) // Print a given set, type argument is the letter printed at the beginning of line (either U for universe or S for set)
 {
-    printf("%c ", type);
+    printf("%c", type);
     if (set->elements[0] != NULL) // If the first element is null, there are no elements in the set
     {
-        printf("%s", set->elements[0]);     // Print the first element
-        for (int i = 1; i < set->size; i++) // Print second through last elements
+        for (int i = 0; i < set->size; i++) // Go through all elements and print them to stdout
         {
             printf(" %s", set->elements[i]);
         }
@@ -75,13 +88,13 @@ void set_print(set_t *set, char type) // Print a given set
     printf("\n");
 }
 
-int set_from_line(set_t *set, char *line)
+int set_from_line(set_t *set, char *line) // Read a given string and create a set from the string
 {
-    char *element = (char *)malloc(31 * sizeof(char));
+    char *element = (char *)malloc(31 * sizeof(char)); // Allocate memory for the element currently being read
 
     int i = 0;
     int number_of_elements = 0;
-    while (line[i] != '\n')
+    while (line[i] != '\n') // Count number of elements - number of '0' characters is the same
     {
         if (line[i] == ' ')
         {
@@ -90,18 +103,18 @@ int set_from_line(set_t *set, char *line)
         i++;
     }
 
-    set_const(set, number_of_elements);
+    set_const(set, number_of_elements); // Run the constructor with the size of the set
 
-    if (number_of_elements != 0)
+    if (number_of_elements != 0) // Set can have no elements, therefore no need to add any elements in this case
     {
-        int element_index = 0;
+        int element_index = 0; // Index of element currently being read
 
-        for (int i = 1; line[i] != '\0'; i++)
+        for (int i = 1; line[i] != '\0'; i++) // Read the given string until the end, starting at index 1 - index 0 defines either set (S) or universe (U)
         {
-            memset(element, '\0', 31);
+            memset(element, '\0', 31); // Set the whole element string to be '\0'
             if (line[i] != ' ')
             {
-                if ((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z'))
+                if ((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z')) // Check if the element consists only of characters of the alphabet
                 {
                     int j = 0;
                     while (line[i] != ' ' && line[i] != '\n')
@@ -109,17 +122,17 @@ int set_from_line(set_t *set, char *line)
                         element[j] = line[i];
                         i++;
                         j++;
-                        if (j > 30)
+                        if (j > 30) // If the length of the currently read element reaches 30, program is terminated
                         {
                             free(element);
                             fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
                             return 1;
                         }
                     }
-                    strcpy((set->elements[element_index]), element);
+                    strcpy((set->elements[element_index]), element); // Copy the read element to the set array
                     element_index++;
                 }
-                else
+                else // If the alphabet criteria isn't met, return error
                 {
                     free(element);
                     fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
@@ -132,19 +145,19 @@ int set_from_line(set_t *set, char *line)
     return 0;
 }
 
-typedef struct
+typedef struct // Custom data type definiton for a pair of strings used in relations
 {
-    char a[31];
-    char b[31];
+    char a[31]; // First element in relation
+    char b[31]; // Second element in relation
 } double_t;
 
-typedef struct
+typedef struct // Custom data type definiton for a relation
 {
-    double_t *elements;
-    int size;
+    double_t *elements; // Array of pairs of strings
+    int size;           // Number of elements in the relation
 } rel_t;
 
-void rel_const(rel_t *rel, int size)
+void rel_const(rel_t *rel, int size) // Constructor for relations
 {
     rel->size = size;
 
@@ -154,17 +167,17 @@ void rel_const(rel_t *rel, int size)
     }
     else
     {
-        rel->elements = malloc(size * sizeof(double_t));
+        rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
     }
 }
 
-void rel_dest(rel_t *rel)
+void rel_dest(rel_t *rel) // Destructor for relations
 {
     free(rel->elements);
     rel->size = 0;
 }
 
-void rel_init(rel_t *rel, char *x, char *y)
+void rel_init(rel_t *rel, char *x, char *y) // TODO smazat pak
 {
     for (int i = 0; i < rel->size; i++)
     {
@@ -173,24 +186,24 @@ void rel_init(rel_t *rel, char *x, char *y)
     }
 }
 
-void rel_print(rel_t *rel)
+void rel_print(rel_t *rel) // Print a given relation
 {
     printf("R");
-    if ((strcmp(rel->elements[0].a, "") != 0) && (strcmp(rel->elements[0].b, "") != 0)) // If the first element is null, there are no elements in the set
+    if ((strcmp(rel->elements[0].a, "") != 0) && (strcmp(rel->elements[0].b, "") != 0)) // If the first element is empty, there are no elements in the relation
     {
-        for (int i = 0; i < rel->size; i++)
+        for (int i = 0; i < rel->size; i++) // Go through all elements in relation
         {
-            printf(" (%s %s)", rel->elements[i].a, rel->elements[i].b); // Print the first through last elements
+            printf(" (%s %s)", rel->elements[i].a, rel->elements[i].b); // Print each element in the given format (first, second)
         }
     }
     printf("\n");
 }
 
-int rel_from_line(rel_t *rel, char *line)
+int rel_from_line(rel_t *rel, char *line) // Read a given string and create a relation from the string
 {
     int i = 0;
     int number_of_pairs = 0;
-    while (line[i] != '\n')
+    while (line[i] != '\n') // Count number of elements - number of '(' characters is the same
     {
         if (line[i] == '(')
         {
@@ -199,32 +212,32 @@ int rel_from_line(rel_t *rel, char *line)
         i++;
     }
 
-    rel_const(rel, number_of_pairs);
+    rel_const(rel, number_of_pairs); // Run the constructor with the size of the relation
 
-    if (number_of_pairs != 0)
+    if (number_of_pairs != 0) // Relation can have no elements, therefore no need to add any elements in this case
     {
-        int pair_index = 0;
+        int pair_index = 0; // Index of pair currently being read
 
         int i = 1;
-        while (line[i] != '\0')
+        while (line[i] != '\0') // Go through the given string until the end
         {
             if (line[i] == '(')
             {
-                i++;
+                i++; // Read the first element
                 int j = 0;
                 while (line[i] != ' ')
                 {
                     rel->elements[pair_index].a[j] = line[i];
                     i++;
                     j++;
-                    if (j > 30)
+                    if (j > 30) // If the length of the currently read element reaches 30, program is terminated
                     {
                         fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
                         return 1;
                     }
                 }
                 i++;
-                j = 0;
+                j = 0; // Same for the second element
                 while (line[i] != ')')
                 {
                     rel->elements[pair_index].b[j] = line[i];
