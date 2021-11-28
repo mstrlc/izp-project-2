@@ -2,7 +2,7 @@
  *      setcal.c
  *  
  *      Set calculator
- *      IZP - 2st project
+ *      IZP - 2nd project
  * 
  *      xkurci00    Kurcikova Julia 
  *      xmacec03    Macecek Patrik  
@@ -17,7 +17,7 @@
 #include <string.h>  // Header defining functions for working with strings
 #include <stdbool.h> // Header defining boolean types
 /*
-TO-DO LIST
+TODO LIST:
 - Prvky univerza nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false
 - kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
 - spravna dealokace a uvolnovani pameti pri chybach
@@ -227,7 +227,7 @@ int rel_from_line(rel_t *rel, char *line) // Read a given string and create a re
                 int j = 0;
                 while (line[i] != ' ')
                 {
-                    rel->elements[pair_index].a[j] = line[i];
+                    rel->elements[pair_index].a[j] = line[i]; // Copy the elements from the string to the relation
                     i++;
                     j++;
                     if (j > 30) // If the length of the currently read element reaches 30, program is terminated
@@ -260,15 +260,23 @@ int rel_from_line(rel_t *rel, char *line) // Read a given string and create a re
     return 0;
 }
 
-int universe_check(set_t *universe)
+int universe_check(set_t *universe) // Check if the universe matches criteria given (no duplicite elements, no true/false, no elements same as commands)
 {
-    for (int i = 0; i < universe->size; i++) // Check if elements are not duplicite
+    for (int i = 0; i < universe->size; i++) // Check if elements are not duplicite or if they are not same as forbidden words
     {
         for (int j = 0; j < universe->size; j++)
         {
-            if ((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j))
+            if (((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j)) ||
+                (strcmp(universe->elements[i], "true") == 0) || (strcmp(universe->elements[i], "false") == 0) ||
+                (strcmp(universe->elements[i], "empty") == 0) || (strcmp(universe->elements[i], "card") == 0) || (strcmp(universe->elements[i], "complement") == 0) ||
+                (strcmp(universe->elements[i], "union") == 0) || (strcmp(universe->elements[i], "intersect") == 0) || (strcmp(universe->elements[i], "minus") == 0) ||
+                (strcmp(universe->elements[i], "subseteq") == 0) || (strcmp(universe->elements[i], "subset") == 0) || (strcmp(universe->elements[i], "equals") == 0) ||
+                (strcmp(universe->elements[i], "reflexive") == 0) || (strcmp(universe->elements[i], "symmetric") == 0) || (strcmp(universe->elements[i], "antisymmetric") == 0) ||
+                (strcmp(universe->elements[i], "transitive") == 0) || (strcmp(universe->elements[i], "function") == 0) || (strcmp(universe->elements[i], "domain") == 0) ||
+                (strcmp(universe->elements[i], "codomain") == 0) || (strcmp(universe->elements[i], "injective") == 0) || (strcmp(universe->elements[i], "surjective") == 0) ||
+                (strcmp(universe->elements[i], "bijective") == 0))
             {
-                fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+                fprintf(stderr, "Universe doesn't match criteria.\nTerminating program.\n");
                 return 1;
             }
         }
@@ -276,9 +284,9 @@ int universe_check(set_t *universe)
     return 0;
 }
 
-int set_check(set_t *set, set_t *univ)
+int set_check(set_t *set, set_t *univ) // Check if a set matches criteria given (all elements are from the universe and they are not duplicite)
 {
-    for (int i = 0; i < set->size; i++)
+    for (int i = 0; i < set->size; i++) // Check if the elements are only from the universe
     {
         bool found = false;
 
@@ -291,7 +299,7 @@ int set_check(set_t *set, set_t *univ)
             }
         }
 
-        if (!found)
+        if (!found) // Print an error if an element not from the universe is found
         {
             fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
             return 1;
@@ -317,9 +325,9 @@ int set_check(set_t *set, set_t *univ)
 //TODO
 // }
 
-void cmd_empty(set_t *set)
+void cmd_empty(set_t *set) // Empty command
 {
-    if (set->size == 0)
+    if (set->size == 0) // If the size of set is 0, the set is empty therefore the command is true
     {
         printf("true\n");
     }
@@ -327,25 +335,25 @@ void cmd_empty(set_t *set)
         printf("false\n");
 }
 
-void cmd_card(set_t *set)
+void cmd_card(set_t *set) // Card command
 {
-    printf("%d\n", set->size);
+    printf("%d\n", set->size); // Print the number of elements in the set
 }
 
-void cmd_complement(set_t *universe, set_t *set)
+void cmd_complement(set_t *universe, set_t *set) // Complement command
 {
-    if (set->size == 0)
+    if (set->size == 0) // If there are no elements in the set, its complement is the same as universe
     {
         set_print(universe, 'S');
     }
     else
     {
-        set_t complement;
-        set_const(&complement, (universe->size - set->size));
+        set_t complement;                                     // Create a new set to store the complements
+        set_const(&complement, (universe->size - set->size)); // The size of complement is the size of universe minus the size of set
 
         int comp_index = 0;
 
-        for (int i = 0; i < universe->size; i++)
+        for (int i = 0; i < universe->size; i++) // Find all the elements that are both in the given set and in universe
         {
             bool found = false;
 
@@ -358,14 +366,14 @@ void cmd_complement(set_t *universe, set_t *set)
                 }
             }
 
-            if (!found)
+            if (!found) // For elements from universe that are not in the set, copy them to the newly created set
             {
                 strcpy(complement.elements[comp_index], universe->elements[i]);
                 comp_index++;
             }
         }
-        set_print(&complement, 'S');
-        set_dest(&complement);
+        set_print(&complement, 'S'); // Print the complement
+        set_dest(&complement);       // Clean up
     }
 }
 
@@ -375,10 +383,10 @@ void cmd_complement(set_t *universe, set_t *set)
 // {
 // }
 
-void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string)
+void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
-    char *command = (char *)malloc(31 * sizeof(char));
-    int index_A = 0;
+    char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
+    int index_A = 0;                                   // Indexes of the sets or relations used
     int index_B = 0;
 
     //tenhle kod nic nedela, ale je tam aby to fungovalo i kdyz se zatim s polem rels nic neprovadi :D
@@ -386,10 +394,10 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string)
     if (false)
         printf("%s", test);
 
-    sscanf(string, "C %s %d %d\n", command, &index_A, &index_B);
+    sscanf(string, "C %s %d %d\n", command, &index_A, &index_B); // Read the line given and save the information needed
     printf("%s %d %d: ", command, index_A, index_B);
 
-    if (strcmp(command, "empty") == 0)
+    if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
         cmd_empty(&sets[index_A]);
     }
@@ -411,99 +419,98 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string)
 
 int main(int argc, char **argv)
 {
-    char *path = argv[1];
-    // printf("number of arguments: %d, path: %s\n", argc, path);
-    if (argc == 2)
+    char *path = argv[1]; // Store the path for the text file containing data
+    if (argc == 2)        // Only two arguments are expected - 1. is name of the program, 2. is the path to the file
     {
         FILE *input_file;
-        input_file = fopen(path, "r");
+        input_file = fopen(path, "r"); // Open the text file given
 
-        if (input_file == NULL)
+        if (input_file == NULL) // If file can't be opened, print error
         {
             fprintf(stderr, "Input file could not be opened. Does the file exist and do you have permissions?\nTerminating program.\n");
             return 1;
         }
 
-        set_t universe;
+        set_t universe; // Set used to store the universe
 
-        int sets_max_number = 5;
-        set_t *sets = (set_t *)malloc(sets_max_number * sizeof(set_t));
+        int sets_max_number = 5;                                        // Maximum number of sets to be allocated, changes throughout the program
+        set_t *sets = (set_t *)malloc(sets_max_number * sizeof(set_t)); // Alocate enough memory for 5 sets
 
-        int rels_max_number = 5;
+        int rels_max_number = 5; // Same for relations
         rel_t *rels = (rel_t *)malloc(rels_max_number * sizeof(rel_t));
 
-        int line_max_len = 50;
-        char *line = (char *)malloc(line_max_len * sizeof(char));
-        int line_index = 0;
-        int row = 1;
-        char c;
+        int line_max_len = 50;                                    // Maximum buffer length for the line being read, can be changed if the line doesn't fit
+        char *line = (char *)malloc(line_max_len * sizeof(char)); // Allocate memory for the line
+        int line_index = 0;                                       // Which character from the line is currently being read
+        int row = 1;                                              // Which row of the text file is being read, used to correctly store sets and relations on their index
+        char c;                                                   // Character being read
 
-        while ((c = fgetc(input_file)) != EOF)
+        while ((c = fgetc(input_file)) != EOF) // Go through the text file until the end of file
         {
-            if (c != '\n')
+            if (c != '\n') // Go trough a line until newline character
             {
-                if (line_index >= line_max_len)
+                if (line_index >= line_max_len) // If the line read is too long to fit in the allocated memory, allocate more
                 {
                     line_max_len += 50;
                     line = realloc(line, (line_max_len) * sizeof(char));
                 }
-                line[line_index] = c;
+                line[line_index] = c; // Save the text to line
                 line_index++;
             }
-            else
+            else // If a newline character is found, decide what happens with the line
             {
                 line[line_index] = '\n';
 
                 switch (line[0])
                 {
-                case 'U':
-                    if ((set_from_line(&universe, line) == 0) && (universe_check(&universe) == 0))
+                case 'U':                                                                          // If the first character of the line is 'U', it defines the universe
+                    if ((set_from_line(&universe, line) == 0) && (universe_check(&universe) == 0)) // Save the universe to a set, if it ran correctly print it
                     {
                         printf("%d: ", row);
                         set_print(&universe, 'U');
                     }
-                    else
+                    else // If the functions to save the universe or check it for being correct returned error, clean up and stop the program
                     {
                         // TODO Clean up
                         return 1;
                     }
                     break;
-                case 'S':
-                    if (row >= sets_max_number)
+                case 'S':                       // If the first character of the line is 'S', it defines a new set
+                    if (row >= sets_max_number) // Check if the new set fits into the memory we allocated for sets
                     {
                         sets_max_number += 10;
-                        sets = realloc(sets, (sets_max_number) * sizeof(set_t));
+                        sets = realloc(sets, (sets_max_number) * sizeof(set_t)); // If it doesn't fit, allocate more memory (10 more sets can fit now)
                     }
-                    if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row], &universe) == 0))
+                    if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row], &universe) == 0)) // Save the set to the array of sets, if it ran correctly print it
                     {
                         printf("%d: ", row);
                         set_print(&sets[row], 'S');
                     }
-                    else
+                    else // If the functions to save the set or check it for being correct returned error, clean up and stop the program
                     {
                         // TODO Clean up
                         return 1;
                     }
                     break;
-                case 'R':
-                    if (row >= rels_max_number)
+                case 'R':                       // If the first character of the line is 'R', it defines a new relation
+                    if (row >= rels_max_number) // Check if the new relation fits into the memory we allocated for relations
                     {
                         rels_max_number += 10;
-                        rels = realloc(sets, (sets_max_number) * sizeof(set_t));
+                        rels = realloc(sets, (sets_max_number) * sizeof(set_t)); // If it doesn't fit, allocate more memory (10 more relations can fit now)
                     }
-                    if ((rel_from_line(&rels[row], line) == 0)) // todo rel check
+                    if ((rel_from_line(&rels[row], line) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
                     {
                         printf("%d: ", row);
                         rel_print(&rels[row]);
                     }
-                    else
+                    else // If the functions to save the relation or check it for being correct returned error, clean up and stop the program
                     {
                         // TODO Clean up
                         return 1;
                     }
                     break;
-                case 'C':
-                    execute_command(&universe, sets, rels, line);
+                case 'C':                                         // If the first character of the line is 'C', it defines a command to be executed
+                    execute_command(&universe, sets, rels, line); // Execute the command // TODO check command
                     break;
                 default:
                     break;
@@ -511,30 +518,31 @@ int main(int argc, char **argv)
 
                 row++;
                 line_index = 0;
-                memset(line, '\0', 50 * sizeof(char));
+                memset(line, '\0', line_max_len * sizeof(char)); // At the end of the line, clear the line
             }
         }
 
-        // Cleaning up
+        // After reading the whole text document, the program is finished
+        // Free all allocated memory and clean up
 
-        free(line);
-        fclose(input_file);
+        free(line);         // Free memory allocated for the line from the text file
+        fclose(input_file); // Close the text file
 
-        for (int i = 0; i < row + 1; i++)
+        for (int i = 0; i < row + 1; i++) // Go through all sets and run the destructor
         {
             set_dest(&sets[i]);
         }
-        free(sets);
+        free(sets); // Free the whole array of sets
 
-        for (int i = 0; i < row + 1; i++)
+        for (int i = 0; i < row + 1; i++) // Go through all relations and run the destructor
         {
             rel_dest(&rels[i]);
         }
-        free(rels);
+        free(rels); // Free the whole array of relations
 
-        set_dest(&universe);
+        set_dest(&universe); // Run the destructor for the set storing the universe
     }
-    else
+    else // If the wrong number of arguments is given, print and error and terminate
     {
         fprintf(stderr, "Wrong number of arguments supplied.\nTerminating program.\n");
         return 1;
