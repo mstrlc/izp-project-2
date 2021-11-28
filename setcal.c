@@ -497,7 +497,7 @@ int main(int argc, char **argv)
                     if (row >= rels_max_number) // Check if the new relation fits into the memory we allocated for relations
                     {
                         rels_max_number += 10;
-                        rels = realloc(sets, (sets_max_number) * sizeof(set_t)); // If it doesn't fit, allocate more memory (10 more relations can fit now)
+                        rels = realloc(rels, (rels_max_number) * sizeof(rel_t)); // If it doesn't fit, allocate more memory (10 more relations can fit now)
                     }
                     if ((rel_from_line(&rels[row], line) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
                     {
