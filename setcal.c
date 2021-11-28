@@ -9,7 +9,7 @@
  *      xpenas02    Penas Dalibor   
  *      xstrel03    Strelec Matyas  
  *           
- *       11/2021
+ *      11/2021
  */
 
 #include <stdio.h>   // Header defining variables and functions for input / output

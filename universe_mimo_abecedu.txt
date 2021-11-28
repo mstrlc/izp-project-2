@@ -1,6 +1,6 @@
-U a b c x y z
-S a b c x d
-S
+U a b 6 x y z
+S a b x y
+S 
 S x y z
 C empty 2
 C empty 3
