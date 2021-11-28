@@ -18,10 +18,11 @@
 #include <stdbool.h> // Header defining boolean types
 /*
 TODO LIST:
-- Prvky univerza nesmí obsahovat identifikátory příkazů (viz níže) a klíčová slova true a false
 - kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
 - spravna dealokace a uvolnovani pameti pri chybach
 - prikazy s mnozinami
+- prikazy s relacemi
+- check spravnosti commandu
 */
 
 typedef struct // Custom data type definiton for a set
