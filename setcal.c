@@ -506,9 +506,9 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     int index_B = 0;
 
     //tenhle kod nic nedela, ale je tam aby to fungovalo i kdyz se zatim s polem rels nic neprovadi :D
-    char *test = rels[3].elements[0].a;
-    if (false)
-        printf("%s", test);
+    //char *test = rels[3].elements[0].a;
+    //if (false)
+    //printf("%s", test);
 
     sscanf(string, "C %s %d %d\n", command, &index_A, &index_B); // Read the line given and save the information needed
     printf("%s %d %d: ", command, index_A, index_B);
