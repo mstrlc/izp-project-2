@@ -384,6 +384,121 @@ void cmd_complement(set_t *universe, set_t *set) // Complement command
 // {
 // }
 
+void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
+{
+    if (rel->size == 0 && universe->size != 0) // If the size of relation is 0 and universe isn't empty, the relation isn't reflexive
+    {
+        printf("false\n");
+        return;
+    }
+
+    for (int i = 0; i < universe->size; i++)
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(universe->elements[i], rel->elements[j].a) == 0 && strcmp(universe->elements[i], rel->elements[j].b) == 0)
+                break;
+            else if (j == rel->size - 1)
+            {
+                printf("false\n");
+                return;
+            }
+        }
+    }
+
+    printf("true\n");
+}
+
+void cmd_symmetric(rel_t *rel) // Symmetric command
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0 && strcmp(rel->elements[i].a, rel->elements[j].b) == 0)
+                break;
+            else if (j == rel->size - 1)
+            {
+                printf("false\n");
+                return;
+            }
+        }
+    }
+    printf("true\n");
+}
+
+void cmd_antisymmetric(rel_t *rel) // Antisymmetric command
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0 && strcmp(rel->elements[i].a, rel->elements[j].b) == 0)
+            {
+                if (!(strcmp(rel->elements[i].a, rel->elements[j].a) == 0 && strcmp(rel->elements[i].b, rel->elements[j].b) == 0))
+                {
+                    printf("false\n");
+                    return;
+                }
+                else if (j == rel->size - 1)
+                {
+                    printf("true\n");
+                    return;
+                }
+            }
+        }
+    }
+    printf("true\n");
+}
+
+void cmd_transitive(rel_t *rel) // Transitive command
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+
+            if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0)
+            {
+                for (int k = 0; k < rel->size; k++)
+                {
+
+                    if (strcmp(rel->elements[i].a, rel->elements[k].a) == 0 && strcmp(rel->elements[j].b, rel->elements[k].b) == 0)
+                        break;
+
+                    if (k == rel->size - 1)
+                    {
+                        printf("false\n");
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    printf("true\n");
+}
+
+void cmd_function(rel_t *rel) // Function command
+{
+    for (int i = 0; i < rel->size; i++)
+    {
+        for (int j = i + 1; j < rel->size; j++)
+        {
+            if (strcmp(rel->elements[i].a, rel->elements[j].a) == 0)
+            {
+                printf("false\n");
+                return;
+            }
+            else if (j == rel->size - 1)
+            {
+                printf("true\n");
+                return;
+            }
+        }
+    }
+    printf("true\n");
+}
+
 void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
     char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
@@ -414,6 +529,27 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     // {
     //     cmd_union(&sets[index_A], &sets[index_B]);
     // }
+    else if (strcmp(command, "reflexive") == 0)
+    {
+        cmd_reflexive(universe, &rels[index_A]);
+    }
+    else if (strcmp(command, "symmetric") == 0)
+    {
+        cmd_symmetric(&rels[index_A]);
+    }
+    else if (strcmp(command, "antisymmetric") == 0)
+    {
+        cmd_antisymmetric(&rels[index_A]);
+    }
+    else if (strcmp(command, "transitive") == 0)
+    {
+        cmd_transitive(&rels[index_A]);
+    }
+    else if (strcmp(command, "function") == 0)
+    {
+        cmd_function(&rels[index_A]);
+    }
+
 
     free(command);
 }
