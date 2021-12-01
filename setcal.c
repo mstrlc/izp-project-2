@@ -662,6 +662,7 @@ void cmd_domain(rel_t *rel){
         num=0;
     }
     printf("\n");
+    free(dom);
 }
 
 void cmd_codomain(rel_t *rel){
@@ -692,7 +693,7 @@ void cmd_codomain(rel_t *rel){
         num=0;
     }
     printf("\n");
-
+    free(codom);
 }
 
 void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
