@@ -482,19 +482,6 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B)
     return true;
 }
 
-bool cmd_subset(set_t *set_A, set_t *set_B)
-{
-    if(cmd_equals(&set_A, &set_B))
-    {
-        return false;
-    }
-    else if(cmd_subseteq(&set_A, &set_B) )
-    {
-        return true;
-    }
-    return false;
-}
-
 bool cmd_equals(set_t *set_A, set_t *set_B)
 {
     if(set_A->size != set_B->size)
@@ -518,6 +505,19 @@ bool cmd_equals(set_t *set_A, set_t *set_B)
     }
     return true;
 }
+
+/* bool cmd_subset(set_t *set_A, set_t *set_B)
+{
+    if(cmd_equals(&set_A, &set_B))
+    {
+        return false;
+    }
+    else if(cmd_subseteq(&set_A, &set_B) )
+    {
+        return true;
+    }
+    return false;
+} */
 
 void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
 {
@@ -634,8 +634,70 @@ void cmd_function(rel_t *rel) // Function command
     printf("true\n");
 }
 
+void cmd_domain(rel_t *rel){
+    printf("S ");
+
+    int num=0;
+    char **dom;
+    dom=(char **)malloc(rel->size * sizeof(char *));
+    *dom=(char *)malloc(31 * sizeof(char));
+
+    for(int i=0; i<rel->size; i++){ //fills domain array for later check
+        dom[i]=rel->elements[i].a;
+    }
+
+    for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
+    {
+       // printf("i %d\n", i);
+        for (int j = i+1; j < rel->size; j++)
+        {
+       // printf("j %d\n", j);
+            if (strcmp(dom[i],dom[j]) == 0)
+            {
+                num++;
+                break;
+            } 
+        }
+        if (num == 0) printf("%s ", dom[i]);
+        num=0;
+    }
+    printf("\n");
+}
+
+void cmd_codomain(rel_t *rel){
+    printf("S ");
+
+    int num=0;
+    char **codom;
+    codom=(char **)malloc(rel->size * sizeof(char *));
+    *codom=(char *)malloc(31 * sizeof(char));
+
+    for(int i=0; i<rel->size; i++){ //fills domain array for later check
+        codom[i]=rel->elements[i].b;
+    }
+
+    for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
+    {
+       // printf("i %d\n", i);
+        for (int j = i+1; j < rel->size; j++)
+        {
+       // printf("j %d\n", j);
+            if (strcmp(codom[i],codom[j]) == 0)
+            {
+                num++;
+                break;
+            } 
+        }
+        if (num == 0) printf("%s ", codom[i]);
+        num=0;
+    }
+    printf("\n");
+
+}
+
 void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
+
     char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
     int index_A = 0;                                   // Indexes of the sets or relations used
     int index_B = 0;
@@ -678,7 +740,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     }
     else if (strcmp(command, "subset") == 0)
     {
-        cmd_subset(&sets[index_A], &sets[index_B]);
+    //    cmd_subset(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "equals") == 0)
     {
@@ -703,6 +765,14 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     else if (strcmp(command, "function") == 0)
     {
         cmd_function(&rels[index_A]);
+    }
+    else if (strcmp(command, "domain") == 0)
+    {
+        cmd_domain(&rels[index_A]);
+    }
+    else if (strcmp(command, "codomain") == 0)
+    {
+        cmd_codomain(&rels[index_A]);
     }
     free(command);
 }
@@ -799,7 +869,7 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
-                case 'C':                                         // If the first character of the line is 'C', it defines a command to be executed
+                case 'C':    // If the first character of the line is 'C', it defines a command to be executed
                     execute_command(&universe, sets, rels, line); // Execute the command // TODO check command
                     break;
                 default:
