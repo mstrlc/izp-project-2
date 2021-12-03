@@ -613,7 +613,7 @@ void cmd_transitive(rel_t *rel) // Transitive command
     printf("true\n");
 }
 
-void cmd_function(rel_t *rel) // Function command
+int cmd_function(rel_t *rel, bool from_cmd) // Function command, from_cmd allows to call this cmd from another cmd without it printing its result
 {
     for (int i = 0; i < rel->size; i++)
     {
@@ -621,17 +621,18 @@ void cmd_function(rel_t *rel) // Function command
         {
             if (strcmp(rel->elements[i].a, rel->elements[j].a) == 0)
             {
-                printf("false\n");
-                return;
+                if(from_cmd==false) printf("false\n");
+                return 0;
             }
             else if (j == rel->size - 1)
             {
-                printf("true\n");
-                return;
+                if(from_cmd==false) printf("true\n");
+                return 1;
             }
         }
     }
-    printf("true\n");
+    if(from_cmd==false) printf("true\n");
+    return 1;
 }
 
 void cmd_domain(rel_t *rel){
@@ -648,10 +649,8 @@ void cmd_domain(rel_t *rel){
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
     {
-       // printf("i %d\n", i);
         for (int j = i+1; j < rel->size; j++)
         {
-       // printf("j %d\n", j);
             if (strcmp(dom[i],dom[j]) == 0)
             {
                 num++;
@@ -673,16 +672,14 @@ void cmd_codomain(rel_t *rel){
     codom=(char **)malloc(rel->size * sizeof(char *));
     *codom=(char *)malloc(31 * sizeof(char));
 
-    for(int i=0; i<rel->size; i++){ //fills domain array for later check
+    for(int i=0; i<rel->size; i++){ //fills codomain array for later check
         codom[i]=rel->elements[i].b;
     }
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
     {
-       // printf("i %d\n", i);
         for (int j = i+1; j < rel->size; j++)
         {
-       // printf("j %d\n", j);
             if (strcmp(codom[i],codom[j]) == 0)
             {
                 num++;
@@ -696,20 +693,97 @@ void cmd_codomain(rel_t *rel){
     free(codom);
 }
 
+int cmd_surjective(rel_t *rel, set_t *setB, bool from_cmd){
+    if(cmd_function(rel, true)== 0){ //checks if rel is function
+        if(from_cmd==false) printf("false\n");
+        return 0;
+    }
+
+    if(rel->size < setB->size){ //from definition of surjectivness, the relation has to have equal or more elements than the set its projecting from
+         if(from_cmd==false) printf("false\n");
+         return 0;
+    }
+
+    int num=0;
+    for(int i=0; i<setB->size; i++){ //for one set element, it goes threw every relations element and its b part, than decide, if every set element is represented at least one in the relation b side
+        for(int j=0; j<rel->size; j++){
+            if(strcmp(setB->elements[i], rel->elements[j].b)!=0){
+                num++;
+            } else {
+                num=0;
+                break;
+            }
+        }
+        if(num!=0){
+            if(from_cmd==false) printf("false\n");
+            return 0;
+        }
+    }
+    if(from_cmd==false) printf("true\n");
+    return 1;
+}
+
+int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd){
+    if(cmd_function(rel, true)== 0){ //checks if rel is function
+            if(from_cmd==false) printf("false\n");
+            return 0;
+        }
+
+    int num=0;
+    for(int i=0; i<setA->size; i++){ //for one setA/B element, it goes threw every relation element and its a/b part, than decide if everz set element is represented at most once
+        for(int j=0; j<rel->size; j++){
+            if(strcmp(setA->elements[i], rel->elements[j].a)==0){
+                num++;
+                break;
+            }
+        }
+        if(num>1){
+            if(from_cmd==false) printf("false\n");
+            return 0;
+        }
+        num=0;
+    }
+    
+    num=0;
+    for(int i=0; i<setB->size; i++){
+        for(int j=0; j<rel->size; j++){
+            if(strcmp(setB->elements[i], rel->elements[j].b)==0){
+                num++;
+                break;
+            }
+        }
+        if(num>1){
+            if(from_cmd==false) printf("false\n");
+            return 0;
+        }
+        num=0;
+    }
+
+    if(from_cmd==false) printf("true\n");
+    return 1;
+}
+
+//void cmd_bijective(rel_t *rel, set_t *setA, set_t *setB){ //calls both functions surjective and injective, if both are true, than bijective is also true
+//    if((cmd_surjective(&rel, &setB, true) && cmd_injective(&rel, &setB, true))==1){
+//        printf("true\n");
+//    } else printf("false\n");
+//}
+
+
 void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
-
     char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
     int index_A = 0;                                   // Indexes of the sets or relations used
     int index_B = 0;
+    int index_C = 0;
 
     //tenhle kod nic nedela, ale je tam aby to fungovalo i kdyz se zatim s polem rels nic neprovadi :D
     //char *test = rels[3].elements[0].a;
     //if (false)
     //printf("%s", test);
 
-    sscanf(string, "C %s %d %d\n", command, &index_A, &index_B); // Read the line given and save the information needed
-    printf("%s %d %d: ", command, index_A, index_B);
+    sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
+    printf("%s %d %d %d: ", command, index_A, index_B, index_C);
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
@@ -765,7 +839,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     }
     else if (strcmp(command, "function") == 0)
     {
-        cmd_function(&rels[index_A]);
+        cmd_function(&rels[index_A], false);
     }
     else if (strcmp(command, "domain") == 0)
     {
@@ -774,6 +848,22 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     else if (strcmp(command, "codomain") == 0)
     {
         cmd_codomain(&rels[index_A]);
+    }
+    else if (strcmp(command, "surjective") == 0)
+    {
+        cmd_surjective(&rels[index_A], &sets[index_C], false);
+    }
+    else if (strcmp(command, "injective") == 0)
+    {
+        cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], false);
+    }
+    else if (strcmp(command, "bijective") == 0)
+    {
+        //cmd_bijective(&rels[index_A], &sets[index_B], &sets[index_C]);
+        
+        if((cmd_surjective(&rels[index_A], &sets[index_C], true) && cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], true))==1){
+            printf("true\n");
+        } else printf("false\n");
     }
     free(command);
 }
