@@ -71,14 +71,6 @@ void set_dest(set_t *set) // Destructor for sets
     set->size = 0;
 }
 
-void set_init(set_t *set, char *string) // TODO smazat pak
-{
-    for (int i = 0; i < set->size; i++)
-    {
-        strcpy(set->elements[i], string);
-    }
-}
-
 void set_print(set_t *set, char type) // Print a given set, type argument is the letter printed at the beginning of line (either U for universe or S for set)
 {
     printf("%c", type);
@@ -186,15 +178,6 @@ void rel_dest(rel_t *rel) // Destructor for relations
 {
     free(rel->elements);
     rel->size = 0;
-}
-
-void rel_init(rel_t *rel, char *x, char *y) // TODO smazat pak
-{
-    for (int i = 0; i < rel->size; i++)
-    {
-        strcpy(rel->elements[i].a, x);
-        strcpy(rel->elements[i].b, y);
-    }
 }
 
 void rel_print(rel_t *rel) // Print a given relation
