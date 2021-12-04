@@ -428,58 +428,6 @@ void cmd_complement(set_t *universe, set_t *set) // Complement command
     }
 }
 
-void cmd_empty(set_t *set) // Empty command
-{
-    if (set->size == 0) // If the size of set is 0, the set is empty therefore the command is true
-    {
-        printf("true\n");
-    }
-    else
-        printf("false\n");
-}
-
-void cmd_card(set_t *set) // Card command
-{
-    printf("%d\n", set->size); // Print the number of elements in the set
-}
-
-void cmd_complement(set_t *universe, set_t *set) // Complement command
-{
-    if (set->size == 0) // If there are no elements in the set, its complement is the same as universe
-    {
-        set_print(universe, 'S');
-    }
-    else
-    {
-        set_t complement;                                     // Create a new set to store the complements
-        set_const(&complement, (universe->size - set->size)); // The size of complement is the size of universe minus the size of set
-
-        int comp_index = 0;
-
-        for (int i = 0; i < universe->size; i++) // Find all the elements that are both in the given set and in universe
-        {
-            bool found = false;
-
-            for (int j = 0; j < set->size; j++)
-            {
-                if (strcmp(universe->elements[i], set->elements[j]) == 0)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) // For elements from universe that are not in the set, copy them to the newly created set
-            {
-                strcpy(complement.elements[comp_index], universe->elements[i]);
-                comp_index++;
-            }
-        }
-        set_print(&complement, 'S'); // Print the complement
-        set_dest(&complement);       // Clean up
-    }
-}
-
 void cmd_union(set_t *set_A, set_t *set_B)
 {
     set_t set_union;
@@ -1052,13 +1000,6 @@ int main(int argc, char **argv)
             else // If a newline character is found, decide what happens with the line
             {
                 line[line_index] = '\n';
-
-                if (line[1] != ' ')
-                {
-                    // TODO Clean up
-                    fprintf(stderr, "Input file is invalid.\nTerminating program.\n");
-                    return 1;
-                }
 
                 switch (line[0])
                 {
