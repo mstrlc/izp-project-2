@@ -457,7 +457,7 @@ void cmd_union(set_t *set_A, set_t *set_B)
         }
     }
     set_print(&set_union, 'S');
-    set_dest(&set_union);
+    // set_dest(&set_union);
 }
 
 void cmd_intersect(set_t *set_A, set_t *set_B)
@@ -487,7 +487,7 @@ void cmd_intersect(set_t *set_A, set_t *set_B)
         }
     }
     set_print(&intersect, 'S');
-    set_dest(&intersect);
+    // set_dest(&intersect);
 }
 
 void cmd_minus(set_t *set_A, set_t *set_B)
@@ -511,7 +511,7 @@ void cmd_minus(set_t *set_A, set_t *set_B)
         }
     }
     set_print(&minus, 'S');
-    set_dest(&minus);
+    // set_dest(&minus);
 }
 
 bool cmd_subseteq(set_t *set_A, set_t *set_B)
