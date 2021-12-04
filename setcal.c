@@ -500,7 +500,7 @@ void cmd_minus(set_t *set_A, set_t *set_B)
     set_dest(&minus);
 }
 
-bool cmd_subseteq(set_t *set_A, set_t *set_B)
+bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
 {
     for (int i = 0; i < set_A->size; i++)
     {
@@ -512,17 +512,29 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B)
             }
             else if (j == set_B->size - 1)
             {
+                if(print == true)
+                {
+                    printf("false\n");
+                }
                 return false;
             }
         }
     }
+    if(print == true)
+    {
+        printf("true\n");
+    }
     return true;
 }
 
-bool cmd_equals(set_t *set_A, set_t *set_B)
+bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
 {
     if (set_A->size != set_B->size)
     {
+        if(print == true)
+        {
+            printf("false\n");
+        }
         return false;
     }
 
@@ -536,25 +548,35 @@ bool cmd_equals(set_t *set_A, set_t *set_B)
             }
             else if (j == set_B->size - 1)
             {
+                if(print == true)
+                {
+                    printf("false\n");
+                }
                 return false;
             }
         }
     }
+    if(print == true)
+    {
+        printf("true\n");
+    }
     return true;
 }
 
-/* bool cmd_subset(set_t *set_A, set_t *set_B)
+void cmd_subset(set_t *set_A, set_t *set_B)
 {
-    if(cmd_equals(&set_A, &set_B))
+    if(cmd_equals(set_A, set_B, false)== true)
     {
-        return false;
+            printf("false\n");
+            return;
     }
-    else if(cmd_subseteq(&set_A, &set_B) )
+    else if(cmd_subseteq(set_A, set_B, false) == true)
     {
-        return true;
+        printf("true\n");
+        return;
     }
-    return false;
-} */
+    printf("false\n");
+}
 
 void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
 {
@@ -877,156 +899,72 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "complement") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_complement(universe, &sets[index_A]);
     }
     else if (strcmp(command, "union") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_union(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "intersect") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_intersect(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "minus") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_minus(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "subseteq") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
-        cmd_subseteq(&sets[index_A], &sets[index_B]);
+        cmd_subseteq(&sets[index_A], &sets[index_B], true);
     }
-    // else if (strcmp(command, "subset") == 0)
-    // {
-    // if (index_A == 0 || index_B == 0 || index_C != 0)
-    // {
-    //     fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-    //     return 1;
-    // }
-    //     cmd_subset(&sets[index_A], &sets[index_B]);
-    // }
+    else if (strcmp(command, "subset") == 0)
+    {
+        cmd_subset(&sets[index_A], &sets[index_B]);
+    }
     else if (strcmp(command, "equals") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
-        cmd_equals(&sets[index_A], &sets[index_B]);
+        cmd_equals(&sets[index_A], &sets[index_B], true);
     }
     else if (strcmp(command, "reflexive") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_reflexive(universe, &rels[index_A]);
     }
     else if (strcmp(command, "symmetric") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_symmetric(&rels[index_A]);
     }
     else if (strcmp(command, "antisymmetric") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_antisymmetric(&rels[index_A]);
     }
     else if (strcmp(command, "transitive") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_transitive(&rels[index_A]);
     }
     else if (strcmp(command, "function") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_function(&rels[index_A], false);
     }
     else if (strcmp(command, "domain") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_domain(&rels[index_A]);
     }
     else if (strcmp(command, "codomain") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_codomain(&rels[index_A]);
     }
     else if (strcmp(command, "surjective") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C == 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_surjective(&rels[index_A], &sets[index_C], false);
     }
     else if (strcmp(command, "injective") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C == 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
         cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], false);
     }
     else if (strcmp(command, "bijective") == 0)
     {
         //cmd_bijective(&rels[index_A], &sets[index_B], &sets[index_C]);
-        if (index_A == 0 || index_B == 0 || index_C == 0)
-        {
-            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-            return 1;
-        }
+
         if ((cmd_surjective(&rels[index_A], &sets[index_C], true) && cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], true)) == 1)
         {
             printf("true\n");
@@ -1131,10 +1069,9 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
-                case 'C':                                                  // If the first character of the line is 'C', it defines a command to be executed
-                    if (execute_command(&universe, sets, rels, line) != 0) // Execute the command
+                case 'C':                                                    // If the first character of the line is 'C', it defines a command to be executed
+                    if ((execute_command(&universe, sets, rels, line) != 0)) // Execute the command
                     {
-                        //TODO cleanup
                         fprintf(stderr, "Invalid input file.\nTerminating program.\n");
                         return 1;
                     }
