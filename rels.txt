@@ -1,4 +1,6 @@
-U a b c x y z
-R (a b) (a c) (x y) (y z)
-R (b c) (x y) (y z)
-R (a b) (y x)
+U dad mom girl boy man woman
+R (dad boy) (dad girl) (mom boy) (mom girl)
+R (dad man) (boy man) (mom woman) (girl woman)
+C reflexive 2
+C symmetric 3
+C function 3

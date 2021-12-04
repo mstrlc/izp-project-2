@@ -58,7 +58,8 @@ void set_const(set_t *set, int size) // Constructor for sets
 
 void set_dest(set_t *set) // Destructor for sets
 {
-    if (!set->empty)
+    if (set->empty == false)
+    {
         for (int i = 0; i < set->size; i++) // Go through all individual elements
         {
             if (set->elements[i] != NULL)
@@ -66,6 +67,7 @@ void set_dest(set_t *set) // Destructor for sets
                 free(set->elements[i]);
             }
         }
+    }
     free(set->elements);
     set->size = 0;
 }
@@ -170,7 +172,9 @@ void rel_const(rel_t *rel, int size) // Constructor for relations
     // }
     // else
     // {
-    rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
+    rel->elements = (double_t *)malloc(size * 2 * 31 * sizeof(char)); // Allocate as much memory as needed for number of elements given
+    // rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
+
     // }
 }
 
@@ -376,109 +380,78 @@ void cmd_card(set_t *set) // Card command
 
 void cmd_complement(set_t *universe, set_t *set) // Complement command
 {
-    if (set->size == 0) // If there are no elements in the set, its complement is the same as universe
-    {
-        set_print(universe, 'S');
-    }
-    else
-    {
-        set_t complement;                                     // Create a new set to store the complements
-        set_const(&complement, (universe->size - set->size)); // The size of complement is the size of universe minus the size of set
+    printf("S");
 
-        int comp_index = 0;
+    for (int i = 0; i < universe->size; i++) // Find all the elements that are both in the given set and in universe
+    {
+        bool found = false;
 
-        for (int i = 0; i < universe->size; i++) // Find all the elements that are both in the given set and in universe
+        for (int j = 0; j < set->size; j++)
         {
-            bool found = false;
-
-            for (int j = 0; j < set->size; j++)
+            if (strcmp(universe->elements[i], set->elements[j]) == 0)
             {
-                if (strcmp(universe->elements[i], set->elements[j]) == 0)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) // For elements from universe that are not in the set, copy them to the newly created set
-            {
-                strcpy(complement.elements[comp_index], universe->elements[i]);
-                comp_index++;
+                found = true;
+                break;
             }
         }
-        set_print(&complement, 'S'); // Print the complement
-        set_dest(&complement);       // Clean up
+
+        if (!found) // For elements from universe that are not in the set, copy them to the newly created set
+        {
+            printf(" %s", universe->elements[i]);
+        }
     }
+    printf("\n");
 }
 
 void cmd_union(set_t *set_A, set_t *set_B)
 {
-    set_t set_union;
-    set_const(&set_union, set_A->size + set_B->size);
-    int pos = 0;
-
+    printf("S");
     for (int i = 0; i < set_A->size; i++)
     {
-        strcpy(set_union.elements[i], set_A->elements[i]);
-        pos++;
+        printf(" %s", set_A->elements[i]);
     }
 
     for (int i = 0; i < set_B->size; i++)
     {
+        bool found = false;
+
         for (int j = 0; j < set_A->size; j++)
         {
-            if (strcmp(set_B->elements[i], set_union.elements[j]) == 0)
+            if (strcmp(set_B->elements[i], set_A->elements[j]) == 0)
             {
-                break;
-            }
-            else if (j == (set_A->size - 1))
-            {
-                strcpy(set_union.elements[pos], set_B->elements[i]);
-                pos++;
+                found = true;
                 break;
             }
         }
+
+        if (found == false)
+        {
+            printf(" %s", set_B->elements[i]);
+        }
     }
-    set_print(&set_union, 'S');
-    // set_dest(&set_union);
+    printf("\n");
 }
 
 void cmd_intersect(set_t *set_A, set_t *set_B)
 {
-    set_t intersect;
-    int pos = 0;
-
-    if (set_A->size > set_B->size)
-    {
-        set_const(&intersect, set_A->size);
-    }
-    else
-    {
-        set_const(&intersect, set_B->size);
-    }
-
+    printf("S");
     for (int i = 0; i < set_A->size; i++)
     {
         for (int j = 0; j < set_B->size; j++)
         {
             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
-                strcpy(intersect.elements[pos], set_A->elements[i]);
-                pos++;
+                printf(" %s", set_A->elements[i]);
                 break;
             }
         }
     }
-    set_print(&intersect, 'S');
-    set_dest(&intersect);
+    printf("\n");
 }
 
 void cmd_minus(set_t *set_A, set_t *set_B)
 {
-    set_t minus;
-    int pos = 0;
-
-    set_const(&minus, set_A->size);
+    printf("S");
 
     for (int i = 0; i < set_A->size; i++)
     {
@@ -490,14 +463,11 @@ void cmd_minus(set_t *set_A, set_t *set_B)
             }
             else if (j == set_B->size - 1)
             {
-                strcpy(minus.elements[pos], set_A->elements[i]);
-                pos++;
+                printf(" %s", set_A->elements[i]);
             }
         }
     }
-    minus.size = pos;
-    set_print(&minus, 'S');
-    set_dest(&minus);
+    printf("\n");
 }
 
 bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
@@ -512,7 +482,7 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
             }
             else if (j == set_B->size - 1)
             {
-                if(print == true)
+                if (print == true)
                 {
                     printf("false\n");
                 }
@@ -520,7 +490,7 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
             }
         }
     }
-    if(print == true)
+    if (print == true)
     {
         printf("true\n");
     }
@@ -531,7 +501,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
 {
     if (set_A->size != set_B->size)
     {
-        if(print == true)
+        if (print == true)
         {
             printf("false\n");
         }
@@ -548,7 +518,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
             }
             else if (j == set_B->size - 1)
             {
-                if(print == true)
+                if (print == true)
                 {
                     printf("false\n");
                 }
@@ -556,7 +526,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
             }
         }
     }
-    if(print == true)
+    if (print == true)
     {
         printf("true\n");
     }
@@ -565,19 +535,18 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
 
 void cmd_subset(set_t *set_A, set_t *set_B)
 {
-    if(cmd_equals(set_A, set_B, false)== true)
+    if (cmd_equals(set_A, set_B, false) == true)
     {
-            printf("false\n");
-            return;
+        printf("false\n");
+        return;
     }
-    else if(cmd_subseteq(set_A, set_B, false) == true)
+    else if (cmd_subseteq(set_A, set_B, false) == true)
     {
         printf("true\n");
         return;
     }
     printf("false\n");
 }
-
 
 void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
 {
@@ -945,11 +914,11 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "subset") == 0)
     {
-    if (index_A == 0 || index_B == 0 || index_C != 0)
-    {
-        fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
-        return 1;
-    }
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_subset(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "equals") == 0)
@@ -1183,16 +1152,16 @@ int main(int argc, char **argv)
         free(line);         // Free memory allocated for the line from the text file
         fclose(input_file); // Close the text file
 
-        // for (int i = 0; i < row + 1; i++) // Go through all sets and run the destructor
-        // {
-        //     set_dest(&sets[i]);
-        // }
+        for (int i = 0; i < sets_max_number; i++) // Go through all sets and run the destructor
+        {
+            set_dest(&sets[i]);
+        }
         free(sets); // Free the whole array of sets
 
-        // for (int i = 0; i < row + 1; i++) // Go through all relations and run the destructor
-        // {
-        //     rel_dest(&rels[i]);
-        // }
+        for (int i = 0; i < rels_max_number; i++) // Go through all relations and run the destructor
+        {
+            rel_dest(&rels[i]);
+        }
         free(rels); // Free the whole array of relations
 
         set_dest(&universe); // Run the destructor for the set storing the universe
