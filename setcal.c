@@ -27,43 +27,46 @@ TODO LIST:
 
 typedef struct // Custom data type definiton for a set
 {
+    bool empty;
     char **elements; // Elements are stored in an array of strings
     int size;        // The number of elements
 } set_t;
 
 void set_const(set_t *set, int size) // Constructor for sets
 {
+    set->empty = false;
     set->size = size; // Set the size of element
 
     // if (size == 0)
     // {
-    //     set->elements = (char *)malloc(sizeof(char *));
+    //     set->elements = malloc(sizeof(char *));
     // }
     // else
     // {
-    set->elements = (char **)malloc(size * sizeof(char *)); // Allocate memory for the array of elements
-    // }
+    set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
 
     for (int i = 0; i < set->size; i++)
     {
-        set->elements[i] = (char *)malloc(31 * sizeof(char)); // Allocate memory for each element
-        if (set->elements[i] == NULL)                         // If malloc returns NULL, there was an error when accessing memory
+        set->elements[i] = malloc(31 * sizeof(char)); // Allocate memory for each element
+        if (set->elements[i] == NULL)                 // If malloc returns NULL, there was an error when accessing memory
         {
             fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
             exit(1);
         }
     }
+    // }
 }
 
 void set_dest(set_t *set) // Destructor for sets
 {
-    for (int i = 0; i < set->size; i++) // Go through all individual elements
-    {
-        if (set->elements[i] != NULL)
+    if (!set->empty)
+        for (int i = 0; i < set->size; i++) // Go through all individual elements
         {
-            free(set->elements[i]);
+            if (set->elements[i] != NULL)
+            {
+                free(set->elements[i]);
+            }
         }
-    }
     free(set->elements);
     set->size = 0;
 }
@@ -79,7 +82,7 @@ void set_init(set_t *set, char *string) // TODO smazat pak
 void set_print(set_t *set, char type) // Print a given set, type argument is the letter printed at the beginning of line (either U for universe or S for set)
 {
     printf("%c", type);
-    if (set->elements[0] != NULL) // If the first element is null, there are no elements in the set
+    if (!set->empty)
     {
         for (int i = 0; i < set->size; i++) // Go through all elements and print them to stdout
         {
@@ -95,11 +98,18 @@ int set_from_line(set_t *set, char *line) // Read a given string and create a se
 
     int i = 0;
     int number_of_elements = 0;
+
     while (line[i] != '\n') // Count number of elements - number of '0' characters is the same
     {
         if (line[i] == ' ')
         {
             number_of_elements++;
+        }
+        if (!((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z') || (line[i] == ' ') || (line[i] >= '0' && line[i] <= '9')))
+        {
+            fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+            free(element);
+            return 1;
         }
         i++;
     }
@@ -115,30 +125,28 @@ int set_from_line(set_t *set, char *line) // Read a given string and create a se
             memset(element, '\0', 31); // Set the whole element string to be '\0'
             if (line[i] != ' ')
             {
-                if ((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z')) // Check if the element consists only of characters of the alphabet
+                int j = 0;
+                while (line[i] != ' ' && line[i] != '\n')
                 {
-                    int j = 0;
-                    while (line[i] != ' ' && line[i] != '\n')
+                    if (!((line[i] >= 'a' && line[i] <= 'z') || (line[i] >= 'A' && line[i] <= 'Z')))
                     {
-                        element[j] = line[i];
-                        i++;
-                        j++;
-                        if (j > 30) // If the length of the currently read element reaches 30, program is terminated
-                        {
-                            free(element);
-                            fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
-                            return 1;
-                        }
+                        fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+                        free(element);
+                        return 1;
                     }
-                    strcpy((set->elements[element_index]), element); // Copy the read element to the set array
-                    element_index++;
+
+                    element[j] = line[i];
+                    i++;
+                    j++;
+                    if (j > 30) // If the length of the currently read element reaches 30, program is terminated
+                    {
+                        free(element);
+                        fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                        return 1;
+                    }
                 }
-                else // If the alphabet criteria isn't met, return error
-                {
-                    free(element);
-                    fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
-                    return 1;
-                }
+                strcpy((set->elements[element_index]), element); // Copy the read element to the set array
+                element_index++;
             }
         }
     }
@@ -154,22 +162,24 @@ typedef struct // Custom data type definiton for a pair of strings used in relat
 
 typedef struct // Custom data type definiton for a relation
 {
+    bool empty;
     double_t *elements; // Array of pairs of strings
     int size;           // Number of elements in the relation
 } rel_t;
 
 void rel_const(rel_t *rel, int size) // Constructor for relations
 {
+    rel->empty = false;
     rel->size = size;
 
-    if (size == 0)
-    {
-        rel->elements = malloc(sizeof(double_t));
-    }
-    else
-    {
-        rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
-    }
+    // if (size == 0)
+    // {
+    //     rel->elements = malloc(sizeof(double_t));
+    // }
+    // else
+    // {
+    rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
+    // }
 }
 
 void rel_dest(rel_t *rel) // Destructor for relations
@@ -267,19 +277,24 @@ int universe_check(set_t *universe) // Check if the universe matches criteria gi
     {
         for (int j = 0; j < universe->size; j++)
         {
-            if (((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j)) ||
-                (strcmp(universe->elements[i], "true") == 0) || (strcmp(universe->elements[i], "false") == 0) ||
-                (strcmp(universe->elements[i], "empty") == 0) || (strcmp(universe->elements[i], "card") == 0) || (strcmp(universe->elements[i], "complement") == 0) ||
-                (strcmp(universe->elements[i], "union") == 0) || (strcmp(universe->elements[i], "intersect") == 0) || (strcmp(universe->elements[i], "minus") == 0) ||
-                (strcmp(universe->elements[i], "subseteq") == 0) || (strcmp(universe->elements[i], "subset") == 0) || (strcmp(universe->elements[i], "equals") == 0) ||
-                (strcmp(universe->elements[i], "reflexive") == 0) || (strcmp(universe->elements[i], "symmetric") == 0) || (strcmp(universe->elements[i], "antisymmetric") == 0) ||
-                (strcmp(universe->elements[i], "transitive") == 0) || (strcmp(universe->elements[i], "function") == 0) || (strcmp(universe->elements[i], "domain") == 0) ||
-                (strcmp(universe->elements[i], "codomain") == 0) || (strcmp(universe->elements[i], "injective") == 0) || (strcmp(universe->elements[i], "surjective") == 0) ||
-                (strcmp(universe->elements[i], "bijective") == 0))
+            if ((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j))
             {
-                fprintf(stderr, "Universe doesn't match criteria.\nTerminating program.\n");
+                fprintf(stderr, "Set doesn't match criteria.\nTerminating program.\n");
                 return 1;
             }
+        }
+
+        if ((strcmp(universe->elements[i], "true") == 0) || (strcmp(universe->elements[i], "false") == 0) ||
+            (strcmp(universe->elements[i], "empty") == 0) || (strcmp(universe->elements[i], "card") == 0) || (strcmp(universe->elements[i], "complement") == 0) ||
+            (strcmp(universe->elements[i], "union") == 0) || (strcmp(universe->elements[i], "intersect") == 0) || (strcmp(universe->elements[i], "minus") == 0) ||
+            (strcmp(universe->elements[i], "subseteq") == 0) || (strcmp(universe->elements[i], "subset") == 0) || (strcmp(universe->elements[i], "equals") == 0) ||
+            (strcmp(universe->elements[i], "reflexive") == 0) || (strcmp(universe->elements[i], "symmetric") == 0) || (strcmp(universe->elements[i], "antisymmetric") == 0) ||
+            (strcmp(universe->elements[i], "transitive") == 0) || (strcmp(universe->elements[i], "function") == 0) || (strcmp(universe->elements[i], "domain") == 0) ||
+            (strcmp(universe->elements[i], "codomain") == 0) || (strcmp(universe->elements[i], "injective") == 0) || (strcmp(universe->elements[i], "surjective") == 0) ||
+            (strcmp(universe->elements[i], "bijective") == 0))
+        {
+            fprintf(stderr, "Set doesn't match criteria.\nTerminating program.\n");
+            return 1;
         }
     }
     return 0;
@@ -321,10 +336,97 @@ int set_check(set_t *set, set_t *univ) // Check if a set matches criteria given 
     return 0;
 }
 
-// int rel_check()
-// {
-//TODO
-// }
+int rel_check(rel_t *rel, set_t *univ)
+{
+    for (int i = 0; i < rel->size; i++) // Check if the elements are only from the universe
+    {
+        bool found_A = false;
+        bool found_B = false;
+
+        for (int j = 0; j < univ->size; j++)
+        {
+            if (strcmp(rel->elements[i].a, univ->elements[j]) == 0)
+            {
+                found_A = true;
+            }
+            if (strcmp(rel->elements[i].b, univ->elements[j]) == 0)
+            {
+                found_B = true;
+            }
+        }
+
+        if (!found_A || !found_B) // Print an error if an element not from the universe is found
+        {
+            fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+            return 1;
+        }
+    }
+
+    for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+            if ((strcmp(rel->elements[i].a, rel->elements[j].a) == 0) && (strcmp(rel->elements[i].b, rel->elements[j].b) == 0) && (i != j))
+            {
+                fprintf(stderr, "Given relation doesn't match criteria.\nTerminating program.\n");
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+void cmd_empty(set_t *set) // Empty command
+{
+    if (set->size == 0) // If the size of set is 0, the set is empty therefore the command is true
+    {
+        printf("true\n");
+    }
+    else
+        printf("false\n");
+}
+
+void cmd_card(set_t *set) // Card command
+{
+    printf("%d\n", set->size); // Print the number of elements in the set
+}
+
+void cmd_complement(set_t *universe, set_t *set) // Complement command
+{
+    if (set->size == 0) // If there are no elements in the set, its complement is the same as universe
+    {
+        set_print(universe, 'S');
+    }
+    else
+    {
+        set_t complement;                                     // Create a new set to store the complements
+        set_const(&complement, (universe->size - set->size)); // The size of complement is the size of universe minus the size of set
+
+        int comp_index = 0;
+
+        for (int i = 0; i < universe->size; i++) // Find all the elements that are both in the given set and in universe
+        {
+            bool found = false;
+
+            for (int j = 0; j < set->size; j++)
+            {
+                if (strcmp(universe->elements[i], set->elements[j]) == 0)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) // For elements from universe that are not in the set, copy them to the newly created set
+            {
+                strcpy(complement.elements[comp_index], universe->elements[i]);
+                comp_index++;
+            }
+        }
+        set_print(&complement, 'S'); // Print the complement
+        set_dest(&complement);       // Clean up
+    }
+}
 
 void cmd_empty(set_t *set) // Empty command
 {
@@ -412,92 +514,56 @@ void cmd_union(set_t *set_A, set_t *set_B)
 
 void cmd_intersect(set_t *set_A, set_t *set_B)
 {
-    int elemenent_count = 0;
-
-    for (int i = 0; i < set_A->size; i++)
-    {
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                elemenent_count++;
-                break;
-            }
-        }
-    }
-
     set_t intersect;
-    set_const(&intersect, elemenent_count);
-
     int pos = 0;
 
+    if (set_A->size > set_B->size)
+    {
+        set_const(&intersect, set_A->size);
+    }
+    else
+    {
+        set_const(&intersect, set_B->size);
+    }
+
     for (int i = 0; i < set_A->size; i++)
     {
         for (int j = 0; j < set_B->size; j++)
         {
             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
-                strcpy(intersect.elements[pos], set_A->elements[i]);
+                strcpy(intersect.elements[pos], set_B->elements[i]);
                 pos++;
                 break;
             }
         }
     }
-
     set_print(&intersect, 'S');
     set_dest(&intersect);
 }
 
 void cmd_minus(set_t *set_A, set_t *set_B)
 {
-    int elemenent_count = 0;
-
-    for (int i = 0; i < set_A->size; i++)
-    {
-        bool found = false;
-
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-        {
-            elemenent_count++;
-        }
-    }
-
     set_t minus;
-    set_const(&minus, elemenent_count);
-
     int pos = 0;
 
     for (int i = 0; i < set_A->size; i++)
     {
-        bool found = false;
-
         for (int j = 0; j < set_B->size; j++)
         {
             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
-                found = true;
                 break;
             }
-        }
-
-        if (!found)
-        {
-            strcpy(minus.elements[pos], set_A->elements[i]);
-            pos++;
+            else if (j + 1 == set_B->size)
+            {
+                strcpy(minus.elements[pos], set_A->elements[i]);
+                pos++;
+            }
         }
     }
-
     set_print(&minus, 'S');
-    // set_dest(&minus);
+    set_dest(&minus);
 }
 
 bool cmd_subseteq(set_t *set_A, set_t *set_B)
@@ -709,7 +775,7 @@ void cmd_domain(rel_t *rel)
 
 void cmd_codomain(rel_t *rel)
 {
-    printf("S ");
+    printf("S");
 
     int num = 0;
     char **codom;
@@ -732,7 +798,7 @@ void cmd_codomain(rel_t *rel)
             }
         }
         if (num == 0)
-            printf("%s ", codom[i]);
+            printf(" %s", codom[i]);
         num = 0;
     }
     printf("\n");
@@ -855,7 +921,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     //printf("%s", test);
 
     sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
-    printf("%s %d %d %d: ", command, index_A, index_B, index_C);
+    // printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
@@ -881,18 +947,18 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     {
         cmd_minus(&sets[index_A], &sets[index_B]);
     }
-    else if (strcmp(command, "subseteq") == 0)
-    {
-        cmd_subseteq(&sets[index_A], &sets[index_B]);
-    }
-    else if (strcmp(command, "subset") == 0)
-    {
-        //    cmd_subset(&sets[index_A], &sets[index_B]);
-    }
-    else if (strcmp(command, "equals") == 0)
-    {
-        cmd_equals(&sets[index_A], &sets[index_B]);
-    }
+    // else if (strcmp(command, "subseteq") == 0)
+    // {
+    //     cmd_subseteq(&sets[index_A], &sets[index_B]);
+    // }
+    // else if (strcmp(command, "subset") == 0)
+    // {
+    //     //    cmd_subset(&sets[index_A], &sets[index_B]);
+    // }
+    // else if (strcmp(command, "equals") == 0)
+    // {
+    //     cmd_equals(&sets[index_A], &sets[index_B]);
+    // }
     else if (strcmp(command, "reflexive") == 0)
     {
         cmd_reflexive(universe, &rels[index_A]);
@@ -971,7 +1037,7 @@ int main(int argc, char **argv)
         int row = 1;                                              // Which row of the text file is being read, used to correctly store sets and relations on their index
         char c;                                                   // Character being read
 
-        while ((c = fgetc(input_file)) != EOF) // Go through the text file until the end of file
+        while (((c = fgetc(input_file)) != EOF)) // Go through the text file until the end of file
         {
             if (c != '\n') // Go trough a line until newline character
             {
@@ -986,6 +1052,13 @@ int main(int argc, char **argv)
             else // If a newline character is found, decide what happens with the line
             {
                 line[line_index] = '\n';
+
+                if (line[1] != ' ')
+                {
+                    // TODO Clean up
+                    fprintf(stderr, "Input file is invalid.\nTerminating program.\n");
+                    return 1;
+                }
 
                 switch (line[0])
                 {
@@ -1024,7 +1097,7 @@ int main(int argc, char **argv)
                         rels_max_number += 10;
                         rels = realloc(rels, (rels_max_number) * sizeof(rel_t)); // If it doesn't fit, allocate more memory (10 more relations can fit now)
                     }
-                    if ((rel_from_line(&rels[row], line) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
+                    if ((rel_from_line(&rels[row], line) == 0) && (rel_check(&rels[row], &universe) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
                     {
                         // printf("%d: ", row);
                         rel_print(&rels[row]);
@@ -1046,6 +1119,11 @@ int main(int argc, char **argv)
                 line_index = 0;
                 memset(line, '\0', line_max_len * sizeof(char)); // At the end of the line, clear the line
             }
+            if (row > 1001)
+            {
+                fprintf(stderr, "Invalid input file.\nTerminating program.\n");
+                return 1;
+            }
         }
 
         // After reading the whole text document, the program is finished
@@ -1054,16 +1132,16 @@ int main(int argc, char **argv)
         free(line);         // Free memory allocated for the line from the text file
         fclose(input_file); // Close the text file
 
-        for (int i = 0; i < row + 1; i++) // Go through all sets and run the destructor
-        {
-            set_dest(&sets[i]);
-        }
+        // for (int i = 0; i < row + 1; i++) // Go through all sets and run the destructor
+        // {
+        //     set_dest(&sets[i]);
+        // }
         free(sets); // Free the whole array of sets
 
-        for (int i = 0; i < row + 1; i++) // Go through all relations and run the destructor
-        {
-            rel_dest(&rels[i]);
-        }
+        // for (int i = 0; i < row + 1; i++) // Go through all relations and run the destructor
+        // {
+        //     rel_dest(&rels[i]);
+        // }
         free(rels); // Free the whole array of relations
 
         set_dest(&universe); // Run the destructor for the set storing the universe
