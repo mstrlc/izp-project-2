@@ -340,7 +340,7 @@ int rel_check(rel_t *rel, set_t *univ)
 
         if (!found_A || !found_B) // Print an error if an element not from the universe is found
         {
-            fprintf(stderr, "Given set doesn't match criteria.\nTerminating program.\n");
+            fprintf(stderr, "Given relation doesn't match criteria.\nTerminating program.\n");
             return 1;
         }
     }
