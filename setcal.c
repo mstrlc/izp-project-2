@@ -411,134 +411,134 @@ void cmd_complement(set_t *universe, set_t *set) // Complement command
     }
 }
 
-void cmd_union(set_t *set_A, set_t *set_B)
-{
-    set_t set_union;
-    set_const(&set_union, set_A->size + set_B->size);
-    int pos = 0;
+// void cmd_union(set_t *set_A, set_t *set_B)
+// {
+//     set_t set_union;
+//     set_const(&set_union, set_A->size + set_B->size);
+//     int pos = 0;
 
-    for (int i = 0; i < set_A->size; i++)
-    {
-        strcpy(set_union.elements[i], set_A->elements[i]);
-        pos++;
-    }
+//     for (int i = 0; i < set_A->size; i++)
+//     {
+//         strcpy(set_union.elements[i], set_A->elements[i]);
+//         pos++;
+//     }
 
-    for (int i = 0; i < set_B->size; i++)
-    {
-        for (int j = 0; j < set_A->size; j++)
-        {
-            if (strcmp(set_B->elements[i], set_union.elements[j]) == 0)
-            {
-                break;
-            }
-            else if (j == (set_A->size - 1))
-            {
-                strcpy(set_union.elements[pos], set_B->elements[i]);
-                pos++;
-                break;
-            }
-        }
-    }
-    set_print(&set_union, 'S');
-    // set_dest(&set_union);
-}
+//     for (int i = 0; i < set_B->size; i++)
+//     {
+//         for (int j = 0; j < set_A->size; j++)
+//         {
+//             if (strcmp(set_B->elements[i], set_union.elements[j]) == 0)
+//             {
+//                 break;
+//             }
+//             else if (j == (set_A->size - 1))
+//             {
+//                 strcpy(set_union.elements[pos], set_B->elements[i]);
+//                 pos++;
+//                 break;
+//             }
+//         }
+//     }
+//     set_print(&set_union, 'S');
+//     // set_dest(&set_union);
+// }
 
-void cmd_intersect(set_t *set_A, set_t *set_B)
-{
-    set_t intersect;
-    int pos = 0;
+// void cmd_intersect(set_t *set_A, set_t *set_B)
+// {
+//     set_t intersect;
+//     int pos = 0;
 
-    if (set_A->size > set_B->size)
-    {
-        set_const(&intersect, set_A->size);
-    }
-    else
-    {
-        set_const(&intersect, set_B->size);
-    }
+//     if (set_A->size > set_B->size)
+//     {
+//         set_const(&intersect, set_A->size);
+//     }
+//     else
+//     {
+//         set_const(&intersect, set_B->size);
+//     }
 
-    for (int i = 0; i < set_A->size; i++)
-    {
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                strcpy(intersect.elements[pos], set_B->elements[i]);
-                pos++;
-                break;
-            }
-        }
-    }
-    set_print(&intersect, 'S');
-    // set_dest(&intersect);
-}
+//     for (int i = 0; i < set_A->size; i++)
+//     {
+//         for (int j = 0; j < set_B->size; j++)
+//         {
+//             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+//             {
+//                 strcpy(intersect.elements[pos], set_B->elements[i]);
+//                 pos++;
+//                 break;
+//             }
+//         }
+//     }
+//     set_print(&intersect, 'S');
+//     // set_dest(&intersect);
+// }
 
-void cmd_minus(set_t *set_A, set_t *set_B)
-{
-    set_t minus;
-    int pos = 0;
+// void cmd_minus(set_t *set_A, set_t *set_B)
+// {
+//     set_t minus;
+//     int pos = 0;
 
-    for (int i = 0; i < set_A->size; i++)
-    {
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                break;
-            }
-            else if (j + 1 == set_B->size)
-            {
-                strcpy(minus.elements[pos], set_A->elements[i]);
-                pos++;
-            }
-        }
-    }
-    set_print(&minus, 'S');
-    // set_dest(&minus);
-}
+//     for (int i = 0; i < set_A->size; i++)
+//     {
+//         for (int j = 0; j < set_B->size; j++)
+//         {
+//             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+//             {
+//                 break;
+//             }
+//             else if (j + 1 == set_B->size)
+//             {
+//                 strcpy(minus.elements[pos], set_A->elements[i]);
+//                 pos++;
+//             }
+//         }
+//     }
+//     set_print(&minus, 'S');
+//     // set_dest(&minus);
+// }
 
-bool cmd_subseteq(set_t *set_A, set_t *set_B)
-{
-    for (int i = 0; i < set_A->size; i++)
-    {
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                break;
-            }
-            else if (j + 1 == set_B->size)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
+// bool cmd_subseteq(set_t *set_A, set_t *set_B)
+// {
+//     for (int i = 0; i < set_A->size; i++)
+//     {
+//         for (int j = 0; j < set_B->size; j++)
+//         {
+//             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+//             {
+//                 break;
+//             }
+//             else if (j + 1 == set_B->size)
+//             {
+//                 return false;
+//             }
+//         }
+//     }
+//     return true;
+// }
 
-bool cmd_equals(set_t *set_A, set_t *set_B)
-{
-    if (set_A->size != set_B->size)
-    {
-        return false;
-    }
+// bool cmd_equals(set_t *set_A, set_t *set_B)
+// {
+//     if (set_A->size != set_B->size)
+//     {
+//         return false;
+//     }
 
-    for (int i = 0; i < set_A->size; i++)
-    {
-        for (int j = 0; j < set_B->size; j++)
-        {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
-            {
-                break;
-            }
-            else if (j + 1 == set_B->size)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
+//     for (int i = 0; i < set_A->size; i++)
+//     {
+//         for (int j = 0; j < set_B->size; j++)
+//         {
+//             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+//             {
+//                 break;
+//             }
+//             else if (j + 1 == set_B->size)
+//             {
+//                 return false;
+//             }
+//         }
+//     }
+//     return true;
+// }
 
 /* bool cmd_subset(set_t *set_A, set_t *set_B)
 {
@@ -876,18 +876,18 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     {
         cmd_complement(universe, &sets[index_A]);
     }
-    else if (strcmp(command, "union") == 0)
-    {
-        cmd_union(&sets[index_A], &sets[index_B]);
-    }
-    else if (strcmp(command, "intersect") == 0)
-    {
-        cmd_intersect(&sets[index_A], &sets[index_B]);
-    }
-    else if (strcmp(command, "minus") == 0)
-    {
-        cmd_minus(&sets[index_A], &sets[index_B]);
-    }
+    // else if (strcmp(command, "union") == 0)
+    // {
+    //     cmd_union(&sets[index_A], &sets[index_B]);
+    // }
+    // else if (strcmp(command, "intersect") == 0)
+    // {
+    //     cmd_intersect(&sets[index_A], &sets[index_B]);
+    // }
+    // else if (strcmp(command, "minus") == 0)
+    // {
+    //     cmd_minus(&sets[index_A], &sets[index_B]);
+    // }
     // else if (strcmp(command, "subseteq") == 0)
     // {
     //     cmd_subseteq(&sets[index_A], &sets[index_B]);
