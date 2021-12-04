@@ -1047,9 +1047,10 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
-                case 'C':                                                    // If the first character of the line is 'C', it defines a command to be executed
-                    if ((execute_command(&universe, sets, rels, line) != 0)) // Execute the command
+                case 'C':                                                  // If the first character of the line is 'C', it defines a command to be executed
+                    if (execute_command(&universe, sets, rels, line) != 0) // Execute the command
                     {
+                        //TODO cleanup
                         fprintf(stderr, "Invalid input file.\nTerminating program.\n");
                         return 1;
                     }
