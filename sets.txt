@@ -17,3 +17,8 @@ C complement 4
 C union 2 5
 C intersect 2 4
 C minus 6 7
+C subseteq 4 7
+C equals 4 7
+C subseteq 2 5
+C equals 2 7
+C subset 4 7
