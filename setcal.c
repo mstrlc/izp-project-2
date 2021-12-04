@@ -20,8 +20,6 @@
 TODO LIST:
 - kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
 - spravna dealokace a uvolnovani pameti pri chybach
-- prikazy s mnozinami
-- prikazy s relacemi
 - check spravnosti commandu
 */
 
@@ -35,7 +33,7 @@ typedef struct // Custom data type definiton for a set
 void set_const(set_t *set, int size) // Constructor for sets
 {
     set->empty = false;
-    set->size = size; // Set the size of element
+    set->size = size; // Set the size of set => number of elements in set
 
     // if (size == 0)
     // {
@@ -43,6 +41,7 @@ void set_const(set_t *set, int size) // Constructor for sets
     // }
     // else
     // {
+
     set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
 
     for (int i = 0; i < set->size; i++)
@@ -480,14 +479,14 @@ void cmd_intersect(set_t *set_A, set_t *set_B)
         {
             if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
-                strcpy(intersect.elements[pos], set_B->elements[i]);
+                strcpy(intersect.elements[pos], set_A->elements[i]);
                 pos++;
                 break;
             }
         }
     }
     set_print(&intersect, 'S');
-    // set_dest(&intersect);
+    set_dest(&intersect);
 }
 
 void cmd_minus(set_t *set_A, set_t *set_B)
@@ -495,6 +494,8 @@ void cmd_minus(set_t *set_A, set_t *set_B)
     set_t minus;
     int pos = 0;
 
+    set_const(&minus, set_A->size);
+    
     for (int i = 0; i < set_A->size; i++)
     {
         for (int j = 0; j < set_B->size; j++)
@@ -503,15 +504,16 @@ void cmd_minus(set_t *set_A, set_t *set_B)
             {
                 break;
             }
-            else if (j + 1 == set_B->size)
+            else if (j == set_B->size - 1)
             {
                 strcpy(minus.elements[pos], set_A->elements[i]);
                 pos++;
             }
         }
     }
+    minus.size=pos;
     set_print(&minus, 'S');
-    // set_dest(&minus);
+    set_dest(&minus);
 }
 
 bool cmd_subseteq(set_t *set_A, set_t *set_B)
@@ -524,7 +526,7 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B)
             {
                 break;
             }
-            else if (j + 1 == set_B->size)
+            else if (j == set_B->size - 1)
             {
                 return false;
             }
@@ -548,7 +550,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B)
             {
                 break;
             }
-            else if (j + 1 == set_B->size)
+            else if (j == set_B->size - 1)
             {
                 return false;
             }
@@ -869,7 +871,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     //printf("%s", test);
 
     sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
-    // printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
+    printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
@@ -901,7 +903,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     // }
     // else if (strcmp(command, "subset") == 0)
     // {
-    //     //    cmd_subset(&sets[index_A], &sets[index_B]);
+    //     cmd_subset(&sets[index_A], &sets[index_B]);
     // }
     // else if (strcmp(command, "equals") == 0)
     // {
@@ -1012,6 +1014,7 @@ int main(int argc, char **argv)
                     else // If the functions to save the universe or check it for being correct returned error, clean up and stop the program
                     {
                         // TODO Clean up
+                        // goto()?
                         return 1;
                     }
                     break;
