@@ -877,72 +877,156 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "complement") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_complement(universe, &sets[index_A]);
     }
     else if (strcmp(command, "union") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_union(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "intersect") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_intersect(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "minus") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_minus(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "subseteq") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_subseteq(&sets[index_A], &sets[index_B]);
     }
     // else if (strcmp(command, "subset") == 0)
     // {
+    // if (index_A == 0 || index_B == 0 || index_C != 0)
+    // {
+    //     fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+    //     return 1;
+    // }
     //     cmd_subset(&sets[index_A], &sets[index_B]);
     // }
     else if (strcmp(command, "equals") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_equals(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "reflexive") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_reflexive(universe, &rels[index_A]);
     }
     else if (strcmp(command, "symmetric") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_symmetric(&rels[index_A]);
     }
     else if (strcmp(command, "antisymmetric") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_antisymmetric(&rels[index_A]);
     }
     else if (strcmp(command, "transitive") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_transitive(&rels[index_A]);
     }
     else if (strcmp(command, "function") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_function(&rels[index_A], false);
     }
     else if (strcmp(command, "domain") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_domain(&rels[index_A]);
     }
     else if (strcmp(command, "codomain") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_codomain(&rels[index_A]);
     }
     else if (strcmp(command, "surjective") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C == 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_surjective(&rels[index_A], &sets[index_C], false);
     }
     else if (strcmp(command, "injective") == 0)
     {
+        if (index_A == 0 || index_B == 0 || index_C == 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], false);
     }
     else if (strcmp(command, "bijective") == 0)
     {
         //cmd_bijective(&rels[index_A], &sets[index_B], &sets[index_C]);
-
+        if (index_A == 0 || index_B == 0 || index_C == 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         if ((cmd_surjective(&rels[index_A], &sets[index_C], true) && cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], true)) == 1)
         {
             printf("true\n");
