@@ -77,7 +77,8 @@ void set_print(set_t *set, char type) // Print a given set, type argument is the
     {
         for (int i = 0; i < set->size; i++) // Go through all elements and print them to stdout
         {
-            printf(" %s", set->elements[i]);
+            if (strcmp(set->elements[i], "") != 0)
+                printf(" %s", set->elements[i]);
         }
     }
     printf("\n");
@@ -854,7 +855,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     //printf("%s", test);
 
     sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
-    printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
+    // printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
@@ -878,30 +879,30 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     {
         cmd_complement(universe, &sets[index_A]);
     }
-    // else if (strcmp(command, "union") == 0)
-    // {
-    //     cmd_union(&sets[index_A], &sets[index_B]);
-    // }
-    // else if (strcmp(command, "intersect") == 0)
-    // {
-    //     cmd_intersect(&sets[index_A], &sets[index_B]);
-    // }
-    // else if (strcmp(command, "minus") == 0)
-    // {
-    //     cmd_minus(&sets[index_A], &sets[index_B]);
-    // }
-    // else if (strcmp(command, "subseteq") == 0)
-    // {
-    //     cmd_subseteq(&sets[index_A], &sets[index_B]);
-    // }
+    else if (strcmp(command, "union") == 0)
+    {
+        cmd_union(&sets[index_A], &sets[index_B]);
+    }
+    else if (strcmp(command, "intersect") == 0)
+    {
+        cmd_intersect(&sets[index_A], &sets[index_B]);
+    }
+    else if (strcmp(command, "minus") == 0)
+    {
+        cmd_minus(&sets[index_A], &sets[index_B]);
+    }
+    else if (strcmp(command, "subseteq") == 0)
+    {
+        cmd_subseteq(&sets[index_A], &sets[index_B]);
+    }
     // else if (strcmp(command, "subset") == 0)
     // {
     //     cmd_subset(&sets[index_A], &sets[index_B]);
     // }
-    // else if (strcmp(command, "equals") == 0)
-    // {
-    //     cmd_equals(&sets[index_A], &sets[index_B]);
-    // }
+    else if (strcmp(command, "equals") == 0)
+    {
+        cmd_equals(&sets[index_A], &sets[index_B]);
+    }
     else if (strcmp(command, "reflexive") == 0)
     {
         cmd_reflexive(universe, &rels[index_A]);
