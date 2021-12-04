@@ -35,22 +35,22 @@ void set_const(set_t *set, int size) // Constructor for sets
 {
     set->size = size; // Set the size of element
 
-    if (size == 0)
-    {
-        set->elements = malloc(sizeof(char *));
-    }
-    else
-    {
-        set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
+    // if (size == 0)
+    // {
+    //     set->elements = (char *)malloc(sizeof(char *));
+    // }
+    // else
+    // {
+    set->elements = (char **)malloc(size * sizeof(char *)); // Allocate memory for the array of elements
+    // }
 
-        for (int i = 0; i < set->size; i++)
+    for (int i = 0; i < set->size; i++)
+    {
+        set->elements[i] = (char *)malloc(31 * sizeof(char)); // Allocate memory for each element
+        if (set->elements[i] == NULL)                         // If malloc returns NULL, there was an error when accessing memory
         {
-            set->elements[i] = malloc(31 * sizeof(char)); // Allocate memory for each element
-            if (set->elements[i] == NULL)                 // If malloc returns NULL, there was an error when accessing memory
-            {
-                fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
-                exit(1);
-            }
+            fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
+            exit(1);
         }
     }
 }
@@ -383,26 +383,26 @@ void cmd_union(set_t *set_A, set_t *set_B)
     set_t set_union;
     set_const(&set_union, set_A->size + set_B->size);
     int pos = 0;
-    
-    for(int i = 0; i < set_A->size; i++)
+
+    for (int i = 0; i < set_A->size; i++)
     {
         strcpy(set_union.elements[i], set_A->elements[i]);
         pos++;
     }
 
-    for(int i = 0; i < set_B->size; i++)
+    for (int i = 0; i < set_B->size; i++)
     {
-        for(int j = 0; j < set_A->size; j++)
+        for (int j = 0; j < set_A->size; j++)
         {
-            if(strcmp(set_B->elements[i], set_union.elements[j]) == 0)
+            if (strcmp(set_B->elements[i], set_union.elements[j]) == 0)
             {
                 break;
             }
-            else if(j == (set_A->size-1))
+            else if (j == (set_A->size - 1))
             {
                 strcpy(set_union.elements[pos], set_B->elements[i]);
                 pos++;
-                break; 
+                break;
             }
         }
     }
@@ -412,68 +412,105 @@ void cmd_union(set_t *set_A, set_t *set_B)
 
 void cmd_intersect(set_t *set_A, set_t *set_B)
 {
-    set_t intersect;
-    int pos = 0;
+    int elemenent_count = 0;
 
-    if(set_A->size > set_B->size)
+    for (int i = 0; i < set_A->size; i++)
     {
-        set_const(&intersect, set_A->size);
-    } 
-    else
-    {
-        set_const(&intersect, set_B->size);
+        for (int j = 0; j < set_B->size; j++)
+        {
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            {
+                elemenent_count++;
+                break;
+            }
+        }
     }
 
-    for(int i = 0; i < set_A->size; i++)
+    set_t intersect;
+    set_const(&intersect, elemenent_count);
+
+    int pos = 0;
+
+    for (int i = 0; i < set_A->size; i++)
     {
-        for(int j = 0; j < set_B->size; j++)
+        for (int j = 0; j < set_B->size; j++)
         {
-            if(strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
-                strcpy(intersect.elements[pos], set_B->elements[i]);
+                strcpy(intersect.elements[pos], set_A->elements[i]);
                 pos++;
                 break;
             }
         }
     }
+
     set_print(&intersect, 'S');
     set_dest(&intersect);
 }
 
 void cmd_minus(set_t *set_A, set_t *set_B)
 {
-    set_t minus;
-    int pos = 0;
-    
-    for(int i = 0; i < set_A->size; i++)
+    int elemenent_count = 0;
+
+    for (int i = 0; i < set_A->size; i++)
     {
-        for(int j = 0; j < set_B->size; j++)
+        bool found = false;
+
+        for (int j = 0; j < set_B->size; j++)
         {
-            if(strcmp(set_A->elements[i], set_B->elements[j]) == 0){
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            {
+                found = true;
                 break;
             }
-            else if(j+1 == set_B->size)
-            {
-                strcpy(minus.elements[pos], set_A->elements[i]);
-                pos++;
-            }
+        }
+
+        if (!found)
+        {
+            elemenent_count++;
         }
     }
+
+    set_t minus;
+    set_const(&minus, elemenent_count);
+
+    int pos = 0;
+
+    for (int i = 0; i < set_A->size; i++)
+    {
+        bool found = false;
+
+        for (int j = 0; j < set_B->size; j++)
+        {
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            strcpy(minus.elements[pos], set_A->elements[i]);
+            pos++;
+        }
+    }
+
     set_print(&minus, 'S');
-    set_dest(&minus);
+    // set_dest(&minus);
 }
 
 bool cmd_subseteq(set_t *set_A, set_t *set_B)
 {
-    for(int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++)
     {
-        for(int j = 0; j < set_B->size; j++)
+        for (int j = 0; j < set_B->size; j++)
         {
-            if(strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
                 break;
             }
-            else if(j+1 == set_B->size)
+            else if (j + 1 == set_B->size)
             {
                 return false;
             }
@@ -484,20 +521,20 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B)
 
 bool cmd_equals(set_t *set_A, set_t *set_B)
 {
-    if(set_A->size != set_B->size)
+    if (set_A->size != set_B->size)
     {
         return false;
     }
 
-    for(int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++)
     {
-        for(int j = 0; j < set_B->size; j++)
+        for (int j = 0; j < set_B->size; j++)
         {
-            if(strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
             {
                 break;
             }
-            else if(j+1 == set_B->size)
+            else if (j + 1 == set_B->size)
             {
                 return false;
             }
@@ -621,145 +658,181 @@ int cmd_function(rel_t *rel, bool from_cmd) // Function command, from_cmd allows
         {
             if (strcmp(rel->elements[i].a, rel->elements[j].a) == 0)
             {
-                if(from_cmd==false) printf("false\n");
+                if (from_cmd == false)
+                    printf("false\n");
                 return 0;
             }
             else if (j == rel->size - 1)
             {
-                if(from_cmd==false) printf("true\n");
+                if (from_cmd == false)
+                    printf("true\n");
                 return 1;
             }
         }
     }
-    if(from_cmd==false) printf("true\n");
+    if (from_cmd == false)
+        printf("true\n");
     return 1;
 }
 
-void cmd_domain(rel_t *rel){
+void cmd_domain(rel_t *rel)
+{
     printf("S ");
 
-    int num=0;
+    int num = 0;
     char **dom;
-    dom=(char **)malloc(rel->size * sizeof(char *));
-    *dom=(char *)malloc(31 * sizeof(char));
+    dom = (char **)malloc(rel->size * sizeof(char *));
+    *dom = (char *)malloc(31 * sizeof(char));
 
-    for(int i=0; i<rel->size; i++){ //fills domain array for later check
-        dom[i]=rel->elements[i].a;
+    for (int i = 0; i < rel->size; i++)
+    { //fills domain array for later check
+        dom[i] = rel->elements[i].a;
     }
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
     {
-        for (int j = i+1; j < rel->size; j++)
+        for (int j = i + 1; j < rel->size; j++)
         {
-            if (strcmp(dom[i],dom[j]) == 0)
+            if (strcmp(dom[i], dom[j]) == 0)
             {
                 num++;
                 break;
-            } 
+            }
         }
-        if (num == 0) printf("%s ", dom[i]);
-        num=0;
+        if (num == 0)
+            printf("%s ", dom[i]);
+        num = 0;
     }
     printf("\n");
     free(dom);
 }
 
-void cmd_codomain(rel_t *rel){
+void cmd_codomain(rel_t *rel)
+{
     printf("S ");
 
-    int num=0;
+    int num = 0;
     char **codom;
-    codom=(char **)malloc(rel->size * sizeof(char *));
-    *codom=(char *)malloc(31 * sizeof(char));
+    codom = (char **)malloc(rel->size * sizeof(char *));
+    *codom = (char *)malloc(31 * sizeof(char));
 
-    for(int i=0; i<rel->size; i++){ //fills codomain array for later check
-        codom[i]=rel->elements[i].b;
+    for (int i = 0; i < rel->size; i++)
+    { //fills codomain array for later check
+        codom[i] = rel->elements[i].b;
     }
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
     {
-        for (int j = i+1; j < rel->size; j++)
+        for (int j = i + 1; j < rel->size; j++)
         {
-            if (strcmp(codom[i],codom[j]) == 0)
+            if (strcmp(codom[i], codom[j]) == 0)
             {
                 num++;
                 break;
-            } 
+            }
         }
-        if (num == 0) printf("%s ", codom[i]);
-        num=0;
+        if (num == 0)
+            printf("%s ", codom[i]);
+        num = 0;
     }
     printf("\n");
     free(codom);
 }
 
-int cmd_surjective(rel_t *rel, set_t *setB, bool from_cmd){
-    if(cmd_function(rel, true)== 0){ //checks if rel is function
-        if(from_cmd==false) printf("false\n");
+int cmd_surjective(rel_t *rel, set_t *setB, bool from_cmd)
+{
+    if (cmd_function(rel, true) == 0)
+    { //checks if rel is function
+        if (from_cmd == false)
+            printf("false\n");
         return 0;
     }
 
-    if(rel->size < setB->size){ //from definition of surjectivness, the relation has to have equal or more elements than the set its projecting from
-         if(from_cmd==false) printf("false\n");
-         return 0;
+    if (rel->size < setB->size)
+    { //from definition of surjectivness, the relation has to have equal or more elements than the set its projecting from
+        if (from_cmd == false)
+            printf("false\n");
+        return 0;
     }
 
-    int num=0;
-    for(int i=0; i<setB->size; i++){ //for one set element, it goes threw every relations element and its b part, than decide, if every set element is represented at least one in the relation b side
-        for(int j=0; j<rel->size; j++){
-            if(strcmp(setB->elements[i], rel->elements[j].b)!=0){
+    int num = 0;
+    for (int i = 0; i < setB->size; i++)
+    { //for one set element, it goes threw every relations element and its b part, than decide, if every set element is represented at least one in the relation b side
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(setB->elements[i], rel->elements[j].b) != 0)
+            {
                 num++;
-            } else {
-                num=0;
+            }
+            else
+            {
+                num = 0;
                 break;
             }
         }
-        if(num!=0){
-            if(from_cmd==false) printf("false\n");
+        if (num != 0)
+        {
+            if (from_cmd == false)
+                printf("false\n");
             return 0;
         }
     }
-    if(from_cmd==false) printf("true\n");
+    if (from_cmd == false)
+        printf("true\n");
     return 1;
 }
 
-int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd){
-    if(cmd_function(rel, true)== 0){ //checks if rel is function
-            if(from_cmd==false) printf("false\n");
-            return 0;
-        }
+int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd)
+{
+    if (cmd_function(rel, true) == 0)
+    { //checks if rel is function
+        if (from_cmd == false)
+            printf("false\n");
+        return 0;
+    }
 
-    int num=0;
-    for(int i=0; i<setA->size; i++){ //for one setA/B element, it goes threw every relation element and its a/b part, than decide if everz set element is represented at most once
-        for(int j=0; j<rel->size; j++){
-            if(strcmp(setA->elements[i], rel->elements[j].a)==0){
+    int num = 0;
+    for (int i = 0; i < setA->size; i++)
+    { //for one setA/B element, it goes threw every relation element and its a/b part, than decide if everz set element is represented at most once
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(setA->elements[i], rel->elements[j].a) == 0)
+            {
                 num++;
                 break;
             }
         }
-        if(num>1){
-            if(from_cmd==false) printf("false\n");
+        if (num > 1)
+        {
+            if (from_cmd == false)
+                printf("false\n");
             return 0;
         }
-        num=0;
+        num = 0;
     }
-    
-    num=0;
-    for(int i=0; i<setB->size; i++){
-        for(int j=0; j<rel->size; j++){
-            if(strcmp(setB->elements[i], rel->elements[j].b)==0){
+
+    num = 0;
+    for (int i = 0; i < setB->size; i++)
+    {
+        for (int j = 0; j < rel->size; j++)
+        {
+            if (strcmp(setB->elements[i], rel->elements[j].b) == 0)
+            {
                 num++;
                 break;
             }
         }
-        if(num>1){
-            if(from_cmd==false) printf("false\n");
+        if (num > 1)
+        {
+            if (from_cmd == false)
+                printf("false\n");
             return 0;
         }
-        num=0;
+        num = 0;
     }
 
-    if(from_cmd==false) printf("true\n");
+    if (from_cmd == false)
+        printf("true\n");
     return 1;
 }
 
@@ -768,7 +841,6 @@ int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd){
 //        printf("true\n");
 //    } else printf("false\n");
 //}
-
 
 void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
@@ -815,7 +887,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     }
     else if (strcmp(command, "subset") == 0)
     {
-    //    cmd_subset(&sets[index_A], &sets[index_B]);
+        //    cmd_subset(&sets[index_A], &sets[index_B]);
     }
     else if (strcmp(command, "equals") == 0)
     {
@@ -860,10 +932,13 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
     else if (strcmp(command, "bijective") == 0)
     {
         //cmd_bijective(&rels[index_A], &sets[index_B], &sets[index_C]);
-        
-        if((cmd_surjective(&rels[index_A], &sets[index_C], true) && cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], true))==1){
+
+        if ((cmd_surjective(&rels[index_A], &sets[index_C], true) && cmd_injective(&rels[index_A], &sets[index_B], &sets[index_C], true)) == 1)
+        {
             printf("true\n");
-        } else printf("false\n");
+        }
+        else
+            printf("false\n");
     }
     free(command);
 }
@@ -917,7 +992,7 @@ int main(int argc, char **argv)
                 case 'U':                                                                          // If the first character of the line is 'U', it defines the universe
                     if ((set_from_line(&universe, line) == 0) && (universe_check(&universe) == 0)) // Save the universe to a set, if it ran correctly print it
                     {
-                        printf("%d: ", row);
+                        // printf("%d: ", row);
                         set_print(&universe, 'U');
                     }
                     else // If the functions to save the universe or check it for being correct returned error, clean up and stop the program
@@ -934,7 +1009,7 @@ int main(int argc, char **argv)
                     }
                     if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row], &universe) == 0)) // Save the set to the array of sets, if it ran correctly print it
                     {
-                        printf("%d: ", row);
+                        // printf("%d: ", row);
                         set_print(&sets[row], 'S');
                     }
                     else // If the functions to save the set or check it for being correct returned error, clean up and stop the program
@@ -951,7 +1026,7 @@ int main(int argc, char **argv)
                     }
                     if ((rel_from_line(&rels[row], line) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
                     {
-                        printf("%d: ", row);
+                        // printf("%d: ", row);
                         rel_print(&rels[row]);
                     }
                     else // If the functions to save the relation or check it for being correct returned error, clean up and stop the program
@@ -960,7 +1035,7 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
-                case 'C':    // If the first character of the line is 'C', it defines a command to be executed
+                case 'C':                                         // If the first character of the line is 'C', it defines a command to be executed
                     execute_command(&universe, sets, rels, line); // Execute the command // TODO check command
                     break;
                 default:
