@@ -858,7 +858,7 @@ int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd)
 //    } else printf("false\n");
 //}
 
-void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
+int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
     char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
     int index_A = 0;                                   // Indexes of the sets or relations used
@@ -875,10 +875,20 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_empty(&sets[index_A]);
     }
     else if (strcmp(command, "card") == 0)
     {
+        if (index_A == 0 || index_B != 0 || index_C != 0)
+        {
+            fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+            return 1;
+        }
         cmd_card(&sets[index_A]);
     }
     else if (strcmp(command, "complement") == 0)
@@ -957,6 +967,7 @@ void execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) //
             printf("false\n");
     }
     free(command);
+    return 0;
 }
 
 int main(int argc, char **argv)
@@ -1052,8 +1063,12 @@ int main(int argc, char **argv)
                         return 1;
                     }
                     break;
-                case 'C':                                         // If the first character of the line is 'C', it defines a command to be executed
-                    execute_command(&universe, sets, rels, line); // Execute the command // TODO check command
+                case 'C':                                                    // If the first character of the line is 'C', it defines a command to be executed
+                    if ((execute_command(&universe, sets, rels, line) != 0)) // Execute the command
+                    {
+                        fprintf(stderr, "Invalid input file.\nTerminating program.\n");
+                        return 1;
+                    }
                     break;
                 default:
                     break;
