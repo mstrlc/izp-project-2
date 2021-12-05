@@ -15,10 +15,20 @@ C complement 2
 C complement 3
 C complement 4
 C union 2 5
+C union 2 3
+C union 4 6
 C intersect 2 4
+C intersect 3 5
+C intersect 7 3
 C minus 6 7
+C minus 4 2
+C minus 2 3
 C subseteq 4 7
-C equals 4 7 
-C subseteq 2 5
-C equals 2 7
-C subset 4 7
+C subseteq 2 3
+C subseteq 7 6
+C subset 2 3
+C subset 4 5
+C subset 7 5
+C equals 2 3
+C equals 4 4
+C equals 7 6
