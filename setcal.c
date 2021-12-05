@@ -16,12 +16,6 @@
 #include <stdlib.h>  // Header defining variables and functions for general functions
 #include <string.h>  // Header defining functions for working with strings
 #include <stdbool.h> // Header defining boolean types
-/*
-TODO LIST:
-- kontrola spravnosti volani prikazu (prikaz nad mnozinou volany na radek s relaci / prikazem)
-- spravna dealokace a uvolnovani pameti pri chybach
-- check spravnosti commandu
-*/
 
 typedef struct // Custom data type definiton for a set
 {
@@ -32,16 +26,8 @@ typedef struct // Custom data type definiton for a set
 
 void set_const(set_t *set, int size) // Constructor for sets
 {
-    set->empty = false;
-    set->size = size; // Set the size of set => number of elements in set
-
-    // if (size == 0)
-    // {
-    //     set->elements = malloc(sizeof(char *));
-    // }
-    // else
-    // {
-
+    set->empty = false;                            // Declare the set not empty
+    set->size = size;                              // Set the size of set => number of elements in set
     set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
 
     for (int i = 0; i < set->size; i++)
@@ -50,17 +36,16 @@ void set_const(set_t *set, int size) // Constructor for sets
         if (set->elements[i] == NULL)                 // If malloc returns NULL, there was an error when accessing memory
         {
             fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
-            exit(1);
+            exit(1); // todo dealloc
         }
     }
-    // }
 }
 
 void set_dest(set_t *set) // Destructor for sets
 {
     if (set->empty == false)
     {
-        for (int i = 0; i < set->size; i++) // Go through all individual elements
+        for (int i = 0; i < set->size; i++) // Go through all each element and free it
         {
             if (set->elements[i] != NULL)
             {
@@ -68,8 +53,9 @@ void set_dest(set_t *set) // Destructor for sets
             }
         }
     }
-    free(set->elements);
+    free(set->elements); // Free the whole array
     set->size = 0;
+    set->empty = true;
 }
 
 void set_print(set_t *set, char type) // Print a given set, type argument is the letter printed at the beginning of line (either U for universe or S for set)
@@ -79,8 +65,7 @@ void set_print(set_t *set, char type) // Print a given set, type argument is the
     {
         for (int i = 0; i < set->size; i++) // Go through all elements and print them to stdout
         {
-            if (strcmp(set->elements[i], "") != 0)
-                printf(" %s", set->elements[i]);
+            printf(" %s", set->elements[i]);
         }
     }
     printf("\n");
@@ -134,8 +119,8 @@ int set_from_line(set_t *set, char *line) // Read a given string and create a se
                     j++;
                     if (j > 30) // If the length of the currently read element reaches 30, program is terminated
                     {
-                        free(element);
                         fprintf(stderr, "Maximum length of element in set is 30 characters.\nTerminating program.\n");
+                        free(element);
                         return 1;
                     }
                 }
@@ -156,7 +141,7 @@ typedef struct // Custom data type definiton for a pair of strings used in relat
 
 typedef struct // Custom data type definiton for a relation
 {
-    bool empty;
+    bool empty;         //
     double_t *elements; // Array of pairs of strings
     int size;           // Number of elements in the relation
 } rel_t;
@@ -165,22 +150,13 @@ void rel_const(rel_t *rel, int size) // Constructor for relations
 {
     rel->empty = false;
     rel->size = size;
-
-    // if (size == 0)
-    // {
-    //     rel->elements = malloc(sizeof(double_t));
-    // }
-    // else
-    // {
     rel->elements = (double_t *)malloc(size * 2 * 31 * sizeof(char)); // Allocate as much memory as needed for number of elements given
-    // rel->elements = malloc(size * sizeof(double_t)); // Allocate as much memory as needed for number of elements given
-
-    // }
+    //todo error
 }
 
 void rel_dest(rel_t *rel) // Destructor for relations
 {
-    free(rel->elements);
+    free(rel->elements); // Free memory allocated for array of elements
     rel->size = 0;
 }
 
@@ -266,7 +242,7 @@ int universe_check(set_t *universe) // Check if the universe matches criteria gi
         {
             if ((strcmp(universe->elements[i], universe->elements[j]) == 0) && (i != j))
             {
-                fprintf(stderr, "Set doesn't match criteria.\nTerminating program.\n");
+                fprintf(stderr, "Universe doesn't match criteria.\nTerminating program.\n");
                 return 1;
             }
         }
@@ -280,7 +256,7 @@ int universe_check(set_t *universe) // Check if the universe matches criteria gi
             (strcmp(universe->elements[i], "codomain") == 0) || (strcmp(universe->elements[i], "injective") == 0) || (strcmp(universe->elements[i], "surjective") == 0) ||
             (strcmp(universe->elements[i], "bijective") == 0))
         {
-            fprintf(stderr, "Set doesn't match criteria.\nTerminating program.\n");
+            fprintf(stderr, "Universe doesn't match criteria.\nTerminating program.\n");
             return 1;
         }
     }
@@ -395,7 +371,7 @@ void cmd_complement(set_t *universe, set_t *set) // Complement command
             }
         }
 
-        if (!found) // For elements from universe that are not in the set, copy them to the newly created set
+        if (!found) // For elements from universe that are not in the set, print them
         {
             printf(" %s", universe->elements[i]);
         }
@@ -403,15 +379,15 @@ void cmd_complement(set_t *universe, set_t *set) // Complement command
     printf("\n");
 }
 
-void cmd_union(set_t *set_A, set_t *set_B)
+void cmd_union(set_t *set_A, set_t *set_B) // Union command
 {
     printf("S");
-    for (int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++) // Print all elements from the first set
     {
         printf(" %s", set_A->elements[i]);
     }
 
-    for (int i = 0; i < set_B->size; i++)
+    for (int i = 0; i < set_B->size; i++) // Find all elements from second set that are not in the first set
     {
         bool found = false;
 
@@ -424,7 +400,7 @@ void cmd_union(set_t *set_A, set_t *set_B)
             }
         }
 
-        if (found == false)
+        if (!found) // Print all found elements
         {
             printf(" %s", set_B->elements[i]);
         }
@@ -432,14 +408,14 @@ void cmd_union(set_t *set_A, set_t *set_B)
     printf("\n");
 }
 
-void cmd_intersect(set_t *set_A, set_t *set_B)
+void cmd_intersect(set_t *set_A, set_t *set_B) // Intersect command
 {
     printf("S");
-    for (int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++) // Go through both sets
     {
         for (int j = 0; j < set_B->size; j++)
         {
-            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0)
+            if (strcmp(set_A->elements[i], set_B->elements[j]) == 0) // If an element is found in both sets, print it
             {
                 printf(" %s", set_A->elements[i]);
                 break;
@@ -453,7 +429,7 @@ void cmd_minus(set_t *set_A, set_t *set_B)
 {
     printf("S");
 
-    for (int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++) // Go through both sets
     {
         for (int j = 0; j < set_B->size; j++)
         {
@@ -461,7 +437,7 @@ void cmd_minus(set_t *set_A, set_t *set_B)
             {
                 break;
             }
-            else if (j == set_B->size - 1)
+            else if (j == set_B->size - 1) // Print elements from the first set which are not found in the second set
             {
                 printf(" %s", set_A->elements[i]);
             }
@@ -470,7 +446,7 @@ void cmd_minus(set_t *set_A, set_t *set_B)
     printf("\n");
 }
 
-bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
+bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print) // Subseteq command
 {
     for (int i = 0; i < set_A->size; i++)
     {
@@ -497,9 +473,9 @@ bool cmd_subseteq(set_t *set_A, set_t *set_B, bool print)
     return true;
 }
 
-bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
+bool cmd_equals(set_t *set_A, set_t *set_B, bool print) // Equals command
 {
-    if (set_A->size != set_B->size)
+    if (set_A->size != set_B->size) // If two sets are not equal in size, they are not equal
     {
         if (print == true)
         {
@@ -508,7 +484,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
         return false;
     }
 
-    for (int i = 0; i < set_A->size; i++)
+    for (int i = 0; i < set_A->size; i++) // Go through elements in both sets
     {
         for (int j = 0; j < set_B->size; j++)
         {
@@ -516,7 +492,7 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
             {
                 break;
             }
-            else if (j == set_B->size - 1)
+            else if (j == set_B->size - 1) // If there is an element in the second set that is not found in the first one, they are not equal
             {
                 if (print == true)
                 {
@@ -533,14 +509,14 @@ bool cmd_equals(set_t *set_A, set_t *set_B, bool print)
     return true;
 }
 
-void cmd_subset(set_t *set_A, set_t *set_B)
+void cmd_subset(set_t *set_A, set_t *set_B) // Subset command
 {
-    if (cmd_equals(set_A, set_B, false) == true)
+    if (cmd_equals(set_A, set_B, false) == true) // If the both sets are equal, A is not proper subset of B
     {
         printf("false\n");
         return;
     }
-    else if (cmd_subseteq(set_A, set_B, false) == true)
+    else if (cmd_subseteq(set_A, set_B, false) == true) // If A is subseteq of B, and they are not equal, A is proper subset of B
     {
         printf("true\n");
         return;
@@ -669,7 +645,7 @@ int cmd_function(rel_t *rel, bool from_cmd) // Function command, from_cmd allows
 
 void cmd_domain(rel_t *rel)
 {
-    printf("S ");
+    printf("S");
 
     int num = 0;
     char **dom;
@@ -692,7 +668,7 @@ void cmd_domain(rel_t *rel)
             }
         }
         if (num == 0)
-            printf("%s ", dom[i]);
+            printf(" %s", dom[i]);
         num = 0;
     }
     printf("\n");
@@ -828,12 +804,6 @@ int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd)
     return 1;
 }
 
-//void cmd_bijective(rel_t *rel, set_t *setA, set_t *setB){ //calls both functions surjective and injective, if both are true, than bijective is also true
-//    if((cmd_surjective(&rel, &setB, true) && cmd_injective(&rel, &setB, true))==1){
-//        printf("true\n");
-//    } else printf("false\n");
-//}
-
 int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
     char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
@@ -841,17 +811,11 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     int index_B = 0;
     int index_C = 0;
 
-    //tenhle kod nic nedela, ale je tam aby to fungovalo i kdyz se zatim s polem rels nic neprovadi :D
-    //char *test = rels[3].elements[0].a;
-    //if (false)
-    //printf("%s", test);
-
     sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
-    // printf("%s %d %d %d:\n", command, index_A, index_B, index_C);
 
-    if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
+    if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text and check if
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || &sets[index_A].empty != false)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -1013,7 +977,6 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "bijective") == 0)
     {
-        //cmd_bijective(&rels[index_A], &sets[index_B], &sets[index_C]);
         if (index_A == 0 || index_B == 0 || index_C == 0)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
@@ -1079,7 +1042,7 @@ int main(int argc, char **argv)
                 case 'U':                                                                          // If the first character of the line is 'U', it defines the universe
                     if ((set_from_line(&universe, line) == 0) && (universe_check(&universe) == 0)) // Save the universe to a set, if it ran correctly print it
                     {
-                        // printf("%d: ", row);
+                        set_from_line(&sets[1], line);
                         set_print(&universe, 'U');
                     }
                     else // If the functions to save the universe or check it for being correct returned error, clean up and stop the program
@@ -1097,7 +1060,6 @@ int main(int argc, char **argv)
                     }
                     if ((set_from_line(&sets[row], line) == 0) && (set_check(&sets[row], &universe) == 0)) // Save the set to the array of sets, if it ran correctly print it
                     {
-                        // printf("%d: ", row);
                         set_print(&sets[row], 'S');
                     }
                     else // If the functions to save the set or check it for being correct returned error, clean up and stop the program
@@ -1114,7 +1076,6 @@ int main(int argc, char **argv)
                     }
                     if ((rel_from_line(&rels[row], line) == 0) && (rel_check(&rels[row], &universe) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
                     {
-                        // printf("%d: ", row);
                         rel_print(&rels[row]);
                     }
                     else // If the functions to save the relation or check it for being correct returned error, clean up and stop the program
