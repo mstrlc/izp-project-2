@@ -544,13 +544,14 @@ void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
         return;
     }
 
-    for (int i = 0; i < universe->size; i++)
+    for (int i = 0; i < universe->size; i++) // Check for every element in universe
     {
-        for (int j = 0; j < rel->size; j++)
+        for (int j = 0; j < rel->size; j++) // Go through every pair in relation
         {
+            // If elements on both indices in the pair are the same, jump to another element in universe
             if (strcmp(universe->elements[i], rel->elements[j].a) == 0 && strcmp(universe->elements[i], rel->elements[j].b) == 0)
                 break;
-            else if (j == rel->size - 1)
+            else if (j == rel->size - 1) // If not found, return false
             {
                 printf("false\n");
                 return;
@@ -563,13 +564,14 @@ void cmd_reflexive(set_t *universe, rel_t *rel) // Reflexive command
 
 void cmd_symmetric(rel_t *rel) // Symmetric command
 {
-    for (int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++) // Go through all the pairs in relation one by one
     {
-        for (int j = 0; j < rel->size; j++)
+        for (int j = 0; j < rel->size; j++) // Compare every pair with all of the others
         {
+            // Look for symmetry, if found, move on to another pair in relation to check
             if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0 && strcmp(rel->elements[i].a, rel->elements[j].b) == 0)
                 break;
-            else if (j == rel->size - 1)
+            else if (j == rel->size - 1) // If symmetry hasn't been found, return false
             {
                 printf("false\n");
                 return;
@@ -581,20 +583,17 @@ void cmd_symmetric(rel_t *rel) // Symmetric command
 
 void cmd_antisymmetric(rel_t *rel) // Antisymmetric command
 {
-    for (int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++) // Go through all the pairs in relation one by one
     {
-        for (int j = 0; j < rel->size; j++)
+        for (int j = 0; j < rel->size; j++) // Compare every pair with all of the others
         {
+            // Look for symmetry
             if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0 && strcmp(rel->elements[i].a, rel->elements[j].b) == 0)
             {
+                // If two pairs are symmetric, but the elements are not equal, return false
                 if (!(strcmp(rel->elements[i].a, rel->elements[j].a) == 0 && strcmp(rel->elements[i].b, rel->elements[j].b) == 0))
                 {
                     printf("false\n");
-                    return;
-                }
-                else if (j == rel->size - 1)
-                {
-                    printf("true\n");
                     return;
                 }
             }
@@ -605,20 +604,18 @@ void cmd_antisymmetric(rel_t *rel) // Antisymmetric command
 
 void cmd_transitive(rel_t *rel) // Transitive command
 {
-    for (int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++) // Go through all the pairs in relation one by one
     {
-        for (int j = 0; j < rel->size; j++)
+        for (int j = 0; j < rel->size; j++) // Compare every pair with all of the others
         {
-
-            if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0)
+            if (strcmp(rel->elements[i].b, rel->elements[j].a) == 0) // If (a b) && (b c)
             {
-                for (int k = 0; k < rel->size; k++)
+                for (int k = 0; k < rel->size; k++) // Look for (a c)
                 {
-
+                    // If found, check other pairs
                     if (strcmp(rel->elements[i].a, rel->elements[k].a) == 0 && strcmp(rel->elements[j].b, rel->elements[k].b) == 0)
                         break;
-
-                    if (k == rel->size - 1)
+                    if (k == rel->size - 1) // If not found, return false
                     {
                         printf("false\n");
                         return;
@@ -632,21 +629,16 @@ void cmd_transitive(rel_t *rel) // Transitive command
 
 int cmd_function(rel_t *rel, bool from_cmd) // Function command, from_cmd allows to call this cmd from another cmd without it printing its result
 {
-    for (int i = 0; i < rel->size; i++)
+    for (int i = 0; i < rel->size; i++) // Go through all the pairs in relation one by one
     {
-        for (int j = i + 1; j < rel->size; j++)
+        for (int j = i + 1; j < rel->size; j++) // Compare every pair with all of the others
         {
+            // If there are (at least) two pairs which have the same element in the first place, relation isn't function
             if (strcmp(rel->elements[i].a, rel->elements[j].a) == 0)
             {
                 if (from_cmd == false)
                     printf("false\n");
                 return 0;
-            }
-            else if (j == rel->size - 1)
-            {
-                if (from_cmd == false)
-                    printf("true\n");
-                return 1;
             }
         }
     }
