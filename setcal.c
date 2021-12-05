@@ -650,11 +650,14 @@ void cmd_domain(rel_t *rel)
     int num = 0;
     char **dom;
     dom = (char **)malloc(rel->size * sizeof(char *));
-    *dom = (char *)malloc(31 * sizeof(char));
+    for (int i = 0; i < rel->size; i++)
+    {
+        dom[i] = (char *)malloc(31 * sizeof(char));
+    }
 
     for (int i = 0; i < rel->size; i++)
     { //fills domain array for later check
-        dom[i] = rel->elements[i].a;
+        strcpy(dom[i], rel->elements[i].a);
     }
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
@@ -675,7 +678,8 @@ void cmd_domain(rel_t *rel)
 
     for (int i = 0; i < rel->size; i++)
     {
-        if(dom[i]!=NULL) free(dom[i]);
+        if (dom[i] != NULL)
+            free(dom[i]);
     }
     free(dom);
 }
@@ -687,11 +691,14 @@ void cmd_codomain(rel_t *rel)
     int num = 0;
     char **codom;
     codom = (char **)malloc(rel->size * sizeof(char *));
-    *codom = (char *)malloc(31 * sizeof(char));
+    for (int i = 0; i < rel->size; i++)
+    {
+        codom[i] = (char *)malloc(31 * sizeof(char));
+    }
 
     for (int i = 0; i < rel->size; i++)
     { //fills codomain array for later check
-        codom[i] = rel->elements[i].b;
+        strcpy(codom[i], rel->elements[i].b);
     }
 
     for (int i = 0; i < rel->size; i++) // Check if elements are not duplicite
@@ -712,7 +719,8 @@ void cmd_codomain(rel_t *rel)
 
     for (int i = 0; i < rel->size; i++)
     {
-       if(codom!=NULL) free(codom[i]);
+        if (codom != NULL)
+            free(codom[i]);
     }
     free(codom);
 }
