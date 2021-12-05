@@ -1,3 +1,0 @@
-U a b c empty
-S a b empty
-C empty 2

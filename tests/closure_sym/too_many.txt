@@ -1,3 +1,0 @@
-U a b c
-R
-C closure_sym 2 2 2

@@ -1,3 +1,0 @@
-U aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b cccccccccccccccccccccccccccccc
-S aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-C empty 2

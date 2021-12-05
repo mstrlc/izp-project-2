@@ -1,3 +1,0 @@
-U a b c d
-R (a b) (a a) (b a) (b b)
-C closure_sym 2

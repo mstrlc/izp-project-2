@@ -1,3 +1,0 @@
-U a b c surjective
-S a b surjective
-C empty 2
