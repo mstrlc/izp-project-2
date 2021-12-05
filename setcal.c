@@ -19,14 +19,14 @@
 
 typedef struct // Custom data type definiton for a set
 {
-    bool empty;
+    bool exists;
     char **elements; // Elements are stored in an array of strings
     int size;        // The number of elements
 } set_t;
 
 int set_const(set_t *set, int size) // Constructor for sets
 {
-    set->empty = false;                            // Declare the set not empty
+    set->exists = true;                            // Declare the set not empty
     set->size = size;                              // Set the size of set => number of elements in set
     set->elements = malloc(size * sizeof(char *)); // Allocate memory for the array of elements
 
@@ -44,7 +44,7 @@ int set_const(set_t *set, int size) // Constructor for sets
 
 void set_dest(set_t *set) // Destructor for sets
 {
-    if (set->empty == false)
+    if (set->exists)
     {
         for (int i = 0; i < set->size; i++) // Go through all each element and free it
         {
@@ -56,13 +56,13 @@ void set_dest(set_t *set) // Destructor for sets
     }
     free(set->elements); // Free the whole array
     set->size = 0;
-    set->empty = true;
+    set->exists = false;
 }
 
 void set_print(set_t *set, char type) // Print a given set, type argument is the letter printed at the beginning of line (either U for universe or S for set)
 {
     printf("%c", type);
-    if (!set->empty)
+    if (set->exists)
     {
         for (int i = 0; i < set->size; i++) // Go through all elements and print them to stdout
         {
@@ -145,14 +145,14 @@ typedef struct // Custom data type definiton for a pair of strings used in relat
 
 typedef struct // Custom data type definiton for a relation
 {
-    bool empty;         //
+    bool exists;        //
     double_t *elements; // Array of pairs of strings
     int size;           // Number of elements in the relation
 } rel_t;
 
 int rel_const(rel_t *rel, int size) // Constructor for relations
 {
-    rel->empty = false;
+    rel->exists = true;
     rel->size = size;
     rel->elements = (double_t *)malloc(size * 2 * 31 * sizeof(char)); // Allocate as much memory as needed for number of elements given
     if (rel->elements == NULL)                                        // If malloc returns NULL, there was an error when accessing memory
@@ -843,9 +843,10 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
 
     sscanf(string, "C %s %d %d %d\n", command, &index_A, &index_B, &index_C); // Read the line given and save the information needed
 
-    if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text and check if
+    if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text
+                                       // and check if corrent number of arguments was called and the called argument is set/relation
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !sets[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -854,7 +855,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "card") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !sets[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -863,7 +864,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "complement") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !sets[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -872,7 +873,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "union") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -881,7 +882,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "intersect") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -890,7 +891,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "minus") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -899,7 +900,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "subseteq") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -908,7 +909,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "subset") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -917,7 +918,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "equals") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C != 0)
+        if (index_A == 0 || index_B == 0 || index_C != 0 || !sets[index_A].exists || !sets[index_B].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -926,7 +927,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "reflexive") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -935,7 +936,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "symmetric") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -944,7 +945,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "antisymmetric") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -953,7 +954,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "transitive") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -962,7 +963,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "function") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -971,7 +972,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "domain") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -980,7 +981,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "codomain") == 0)
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0)
+        if (index_A == 0 || index_B != 0 || index_C != 0 || !rels[index_A].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -989,7 +990,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "surjective") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C == 0)
+        if (index_A == 0 || index_B == 0 || index_C == 0 || !rels[index_A].exists || !sets[index_B].exists || !sets[index_C].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -998,7 +999,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "injective") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C == 0)
+        if (index_A == 0 || index_B == 0 || index_C == 0 || !rels[index_A].exists || !sets[index_B].exists || !sets[index_C].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -1007,7 +1008,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
     }
     else if (strcmp(command, "bijective") == 0)
     {
-        if (index_A == 0 || index_B == 0 || index_C == 0)
+        if (index_A == 0 || index_B == 0 || index_C == 0 || !rels[index_A].exists || !sets[index_B].exists || !sets[index_C].exists)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
@@ -1018,6 +1019,11 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
         }
         else
             printf("false\n");
+    }
+    else
+    {
+        fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
+        return 1;
     }
     return 0;
 }
@@ -1079,6 +1085,7 @@ int main(int argc, char **argv)
                     {
                         error = true;
                     }
+
                     break;
                 case 'S':                       // If the first character of the line is 'S', it defines a new set
                     if (row >= sets_max_number) // Check if the new set fits into the memory we allocated for sets
@@ -1094,6 +1101,7 @@ int main(int argc, char **argv)
                     {
                         error = true;
                     }
+
                     break;
                 case 'R':                       // If the first character of the line is 'R', it defines a new relation
                     if (row >= rels_max_number) // Check if the new relation fits into the memory we allocated for relations
@@ -1113,7 +1121,6 @@ int main(int argc, char **argv)
                 case 'C':                                                  // If the first character of the line is 'C', it defines a command to be executed
                     if (execute_command(&universe, sets, rels, line) != 0) // Execute the command
                     {
-                        fprintf(stderr, "Invalid input file.\nTerminating program.\n");
                         error = true;
                     }
                     break;
@@ -1130,6 +1137,12 @@ int main(int argc, char **argv)
                 error = true;
                 fprintf(stderr, "Invalid input file.\nTerminating program.\n");
             }
+        }
+
+        if (!universe.exists)
+        {
+            fprintf(stderr, "Invalid input file.\nTerminating program.\n");
+            error = true;
         }
 
         // After reading the whole text document, the program is finished
