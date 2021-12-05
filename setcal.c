@@ -24,7 +24,7 @@ typedef struct // Custom data type definiton for a set
     int size;        // The number of elements
 } set_t;
 
-void set_const(set_t *set, int size) // Constructor for sets
+int set_const(set_t *set, int size) // Constructor for sets
 {
     set->empty = false;                            // Declare the set not empty
     set->size = size;                              // Set the size of set => number of elements in set
@@ -36,9 +36,10 @@ void set_const(set_t *set, int size) // Constructor for sets
         if (set->elements[i] == NULL)                 // If malloc returns NULL, there was an error when accessing memory
         {
             fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
-            exit(1); // todo dealloc
+            return 1;
         }
     }
+    return 0;
 }
 
 void set_dest(set_t *set) // Destructor for sets
@@ -93,7 +94,10 @@ int set_from_line(set_t *set, char *line) // Read a given string and create a se
         i++;
     }
 
-    set_const(set, number_of_elements); // Run the constructor with the size of the set
+    if (set_const(set, number_of_elements) != 0) // Run the constructor with the size of the set
+    {
+        return 1;
+    }
 
     if (number_of_elements != 0) // Set can have no elements, therefore no need to add any elements in this case
     {
@@ -146,12 +150,17 @@ typedef struct // Custom data type definiton for a relation
     int size;           // Number of elements in the relation
 } rel_t;
 
-void rel_const(rel_t *rel, int size) // Constructor for relations
+int rel_const(rel_t *rel, int size) // Constructor for relations
 {
     rel->empty = false;
     rel->size = size;
     rel->elements = (double_t *)malloc(size * 2 * 31 * sizeof(char)); // Allocate as much memory as needed for number of elements given
-    //todo error
+    if (rel->elements == NULL)                                        // If malloc returns NULL, there was an error when accessing memory
+    {
+        fprintf(stderr, "Memory not accessible.\nTerminating program.\n");
+        return 1;
+    }
+    return 0;
 }
 
 void rel_dest(rel_t *rel) // Destructor for relations
@@ -186,7 +195,10 @@ int rel_from_line(rel_t *rel, char *line) // Read a given string and create a re
         i++;
     }
 
-    rel_const(rel, number_of_pairs); // Run the constructor with the size of the relation
+    if (rel_const(rel, number_of_pairs) != 0) // Run the constructor with the size of the relation
+    {
+        return 1;
+    }
 
     if (number_of_pairs != 0) // Relation can have no elements, therefore no need to add any elements in this case
     {
@@ -1089,7 +1101,7 @@ int main(int argc, char **argv)
                         rels_max_number += 10;
                         rels = realloc(rels, (rels_max_number) * sizeof(rel_t)); // If it doesn't fit, allocate more memory (10 more relations can fit now)
                     }
-                    if ((rel_from_line(&rels[row], line) == 0) && (rel_check(&rels[row], &universe) == 0)) // Save the relation to the array of relations, if it ran correctly print it // TODO check rel
+                    if ((rel_from_line(&rels[row], line) == 0) && (rel_check(&rels[row], &universe) == 0)) // Save the relation to the array of relations, if it ran correctly print it
                     {
                         rel_print(&rels[row]);
                     }
