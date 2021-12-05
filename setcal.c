@@ -672,6 +672,11 @@ void cmd_domain(rel_t *rel)
         num = 0;
     }
     printf("\n");
+
+    for (int i = 0; i < rel->size; i++)
+    {
+        if(dom[i]!=NULL) free(dom[i]);
+    }
     free(dom);
 }
 
@@ -704,6 +709,11 @@ void cmd_codomain(rel_t *rel)
         num = 0;
     }
     printf("\n");
+
+    for (int i = 0; i < rel->size; i++)
+    {
+       if(codom!=NULL) free(codom[i]);
+    }
     free(codom);
 }
 
