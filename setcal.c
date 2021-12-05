@@ -806,8 +806,8 @@ int cmd_injective(rel_t *rel, set_t *setA, set_t *setB, bool from_cmd)
 
 int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // Decide what happens when reading a line defining a command
 {
-    char *command = (char *)malloc(31 * sizeof(char)); // Allocate memory for the name of the element
-    int index_A = 0;                                   // Indexes of the sets or relations used
+    char command[31]; // Store the name of the command
+    int index_A = 0;  // Indexes of the sets or relations used
     int index_B = 0;
     int index_C = 0;
 
@@ -989,7 +989,6 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
         else
             printf("false\n");
     }
-    free(command);
     return 0;
 }
 
@@ -1020,8 +1019,9 @@ int main(int argc, char **argv)
         int line_index = 0;                                       // Which character from the line is currently being read
         int row = 1;                                              // Which row of the text file is being read, used to correctly store sets and relations on their index
         char c;                                                   // Character being read
+        bool error = false;
 
-        while (((c = fgetc(input_file)) != EOF)) // Go through the text file until the end of file
+        while (((c = fgetc(input_file)) != EOF) && (error != true)) // Go through the text file until the end of file
         {
             if (c != '\n') // Go trough a line until newline character
             {
@@ -1047,9 +1047,7 @@ int main(int argc, char **argv)
                     }
                     else // If the functions to save the universe or check it for being correct returned error, clean up and stop the program
                     {
-                        // TODO Clean up
-                        // goto()?
-                        return 1;
+                        error = true;
                     }
                     break;
                 case 'S':                       // If the first character of the line is 'S', it defines a new set
@@ -1064,8 +1062,7 @@ int main(int argc, char **argv)
                     }
                     else // If the functions to save the set or check it for being correct returned error, clean up and stop the program
                     {
-                        // TODO Clean up
-                        return 1;
+                        error = true;
                     }
                     break;
                 case 'R':                       // If the first character of the line is 'R', it defines a new relation
@@ -1080,16 +1077,14 @@ int main(int argc, char **argv)
                     }
                     else // If the functions to save the relation or check it for being correct returned error, clean up and stop the program
                     {
-                        // TODO Clean up
-                        return 1;
+                        error = true;
                     }
                     break;
                 case 'C':                                                  // If the first character of the line is 'C', it defines a command to be executed
                     if (execute_command(&universe, sets, rels, line) != 0) // Execute the command
                     {
-                        //TODO cleanup
                         fprintf(stderr, "Invalid input file.\nTerminating program.\n");
-                        return 1;
+                        error = true;
                     }
                     break;
                 default:
@@ -1102,8 +1097,8 @@ int main(int argc, char **argv)
             }
             if (row > 1001)
             {
+                error = true;
                 fprintf(stderr, "Invalid input file.\nTerminating program.\n");
-                return 1;
             }
         }
 
@@ -1126,6 +1121,15 @@ int main(int argc, char **argv)
         free(rels); // Free the whole array of relations
 
         set_dest(&universe); // Run the destructor for the set storing the universe
+
+        if (error)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
     else // If the wrong number of arguments is given, print and error and terminate
     {
