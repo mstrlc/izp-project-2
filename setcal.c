@@ -815,7 +815,7 @@ int execute_command(set_t *universe, set_t *sets, rel_t *rels, char *string) // 
 
     if (strcmp(command, "empty") == 0) // Execute a command based on what was read from the line of text and check if
     {
-        if (index_A == 0 || index_B != 0 || index_C != 0 || &sets[index_A].empty != false)
+        if (index_A == 0 || index_B != 0 || index_C != 0)
         {
             fprintf(stderr, "Wrong input file format.\nTerminating program.\n");
             return 1;
